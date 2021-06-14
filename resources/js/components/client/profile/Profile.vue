@@ -41,7 +41,7 @@
                 />
                 <ProfileFollow
                     v-if="!this.owned"
-                    :followable="true"
+                    :followable="this.followable"
                     :profile_id="this.profile.id"
                 />
             </div>
@@ -77,6 +77,10 @@ export default {
             default: [],
         },
         user_profile: Object,
+        followable: {
+            type: Number,
+            default: 0,
+        },
     },
     components: {
         EditProfileForm,
@@ -86,7 +90,7 @@ export default {
     },
     methods: {
         ...mapActions(["getProfileAction"]),
-        ...mapMutations(["profileMutate"]),
+        ...mapMutations(["profileMutate", "setFollowState"]),
     },
     computed: {
         ...mapGetters(["profile"]),
@@ -106,6 +110,16 @@ export default {
                     break;
             }
         });
+        if (!this.owned) {
+            try {
+                const response = await axios.post("/profile/followed", {
+                    following_id: this.profile.id,
+                });
+                this.setFollowState(response.data.followed); // true, false
+            } catch (error) {
+                console.log(error);
+            }
+        }
     },
     mounted() {
         this.loading = false;

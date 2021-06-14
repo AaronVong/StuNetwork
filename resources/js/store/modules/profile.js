@@ -5,6 +5,7 @@ const toast = {
             validates: {},
             message: "",
             profile: {},
+            followed: false,
         };
     },
     actions: {
@@ -33,8 +34,7 @@ const toast = {
                 const response = await axios.post("/profile/follow", {
                     following_id,
                 });
-                console.log(response.data);
-                // commit("toggleFollowSuccess", response.data);
+                commit("setFollowState", response.data.followed);
             } catch (error) {
                 console.log(error.response);
                 // commit("handleError", error.response);
@@ -42,7 +42,9 @@ const toast = {
         },
     },
     mutations: {
-        toggleFollowSuccess(state, payload) {},
+        setFollowState(state, payload) {
+            state.followed = payload;
+        },
         handleError(state, payload) {},
         profileMutate(state, payload) {
             state.profile = { ...payload };
@@ -67,6 +69,9 @@ const toast = {
         },
         profileMessage(state) {
             return state.message;
+        },
+        followed(state) {
+            return state.followed;
         },
     },
 };

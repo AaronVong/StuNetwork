@@ -62,6 +62,6 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
     }
 
     public function followings(){
-        return $this->belongsToMany(Profile::class);
+        return $this->belongsToMany(Profile::class, "user_follows", "follower_id", "following_id");
     }
 }

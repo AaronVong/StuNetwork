@@ -22,6 +22,6 @@ class Profile extends Model
     }
 
     function followers(){
-        return $this->belongsToMany(User::class);
+        return $this->belongsToMany(User::class, "user_follows", "following_id", "follower_id");
     }
 }

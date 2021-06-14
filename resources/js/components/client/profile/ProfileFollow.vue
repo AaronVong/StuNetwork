@@ -1,8 +1,9 @@
 <template>
     <div class="flex justify-end items-center h-full">
         <button
-            v-if="this.followable"
+            v-if="!this.followed"
             @click="this.handleFollow"
+            v-loading="this.loading"
             type="button"
             class="
                 follow
@@ -24,6 +25,7 @@
         <button
             v-else
             @click="this.handleFollow"
+            v-loading="this.loading"
             type="button"
             class="
                 unfollow
@@ -43,18 +45,37 @@
 </template>
 
 <script>
-import { mapActions } from "vuex";
+import { mapGetters, mapActions } from "vuex";
 export default {
     name: "ProfileFollow",
+    computed: {
+        ...mapGetters(["followed"]),
+    },
+    data() {
+        return {
+            loading: false,
+        };
+    },
     props: {
-        followable: Boolean,
+        followable: Number,
         profile_id: Number,
     },
     methods: {
         ...mapActions(["toggleFollow"]),
         async handleFollow(e) {
             e.preventDefault();
+            this.loading = true;
             await this.toggleFollow(this.profile_id);
+            this.loading = false;
+            if (this.followed) {
+                this.$message.success({
+                    message: "Theo dõi profile",
+                });
+            } else {
+                this.$message.error({
+                    message: "Hủy thõi profile",
+                });
+            }
         },
     },
 };

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Client;
 use App\Http\Controllers\Controller;
 use App\Models\Profile;
 use App\Models\User;
+use App\Models\UserFollow;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
@@ -118,11 +119,32 @@ class ProfileController extends Controller
         if($profile){
             $response = Gate::inspect("follow", $profile);
             if($response->allow()){
-                $request->user()->toggleFollow($profile);
-                return response(["message"=> "Thành công"],200);
+                $isFollowed = $request->user()->followings()->where("following_id", $request->following_id)->first() == null ? false : true;
+                if($isFollowed){
+                    $request->user()->followings()->detach($request->following_id);
+                    $isFollowed = false;
+                }
+                else{
+                    $request->user()->followings()->attach($request->following_id);
+                    $isFollowed = true;
+                }
+                return response(["followed" => $isFollowed],200);
             }else{
                 return response(["message" => $response->message()], 403);
             }
+        }
+        return response(["message" => "Profile không tồn tại"], 404);
+    }
+
+    public function followed(Request $request){
+        $profile = Profile::find($request->following_id);
+        if($profile){
+            $response = Gate::inspect("follow", $profile);
+            if($response->allow()){
+                $isFollowed = $request->user()->followings()->where("following_id", $request->following_id)->first() == null ? false : true;
+                return response(["followed" =>  $isFollowed], 200);
+            }
+            return response(["message" => $response->message()], 403);
         }
         return response(["message" => "Profile không tồn tại"], 404);
     }

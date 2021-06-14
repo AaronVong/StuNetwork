@@ -1,0 +1,131 @@
+/*
+|--------------------------------------------------------------------------
+| Global CSS
+|--------------------------------------------------------------------------
+*/
+
+:root {
+    --main-red-text: #fc5c7d;
+    --main-blue-text: #6a82fb;
+    --main-blue-disabled: #6a82fb94;
+}
+body,
+html {
+    width: 100%;
+    height: 100%;
+    font-size: 16px;
+}
+
+#app {
+    /* background-color: whitesmoke; */
+}
+
+.pill {
+    position: relative;
+    z-index: 3;
+}
+
+.pill-hover:hover {
+    color: #60a5fa !important;
+    transition: color 100ms linear;
+}
+
+.pill-hover {
+    position: relative;
+    padding: 0 0.25rem;
+}
+
+.pill-hover:before {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    transition: 200ms linear;
+    left: 0%;
+    top: 0;
+    border-radius: 25px;
+}
+
+.pill-hover--cycle::before {
+    width: 40px;
+    height: 40px;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 50% !important;
+}
+
+.pill-hover--red:hover {
+    color: #fc5c7d !important;
+}
+.pill-hover--red:hover:before {
+    background-color: #fc5c7c3a !important;
+}
+
+.pill-hover:hover::before {
+    background-color: #3b83f61f;
+}
+/*
+|--------------------------------------------------------------------------
+| Auth CSS
+|--------------------------------------------------------------------------
+*/
+.auth-container {
+    background: linear-gradient(to right, #fc5c7d, #6a82fb);
+}
+
+.main-red {
+    color: var(--main-red-text) !important;
+}
+
+.main-blue {
+    color: var(--main-blue-text) !important;
+}
+/*
+|--------------------------------------------------------------------------
+| Page CSS (layout.balde.php)
+|--------------------------------------------------------------------------
+*/
+
+/*
+|--------------------------------------------------------------------------
+| Profile Page CSS
+|--------------------------------------------------------------------------
+*/
+.avatar {
+    top: -150%;
+}
+.follow,
+.unfollow {
+    position: relative;
+}
+
+.unfollow:before {
+    content: "Đang theo dõi";
+    position: absolute;
+    width: 100%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.unfollow:hover::before {
+    content: "Hủy theo dõi";
+}
+/*
+|--------------------------------------------------------------------------
+| Toast
+|--------------------------------------------------------------------------
+*/
+.btn-isDisabled {
+    background-color: #93c5fd !important;
+    cursor: not-allowed !important;
+}
+
+.btn-basic {
+    background-color: #3b82f6;
+    cursor: pointer;
+}
+.btn-basic:hover {
+    background-color: #2563eb;
+}

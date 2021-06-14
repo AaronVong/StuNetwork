@@ -1,0 +1,62 @@
+require("./bootstrap");
+import { createApp } from "vue";
+import store from "./store/index";
+/*
+|
+| Element plus
+|
+*/
+import {
+    ElDialog,
+    ElLoading,
+    ElButton,
+    ElPopover,
+    ElUpload,
+    ElMessage,
+    ElSkeleton,
+    ElSkeletonItem,
+    ElPopconfirm,
+    ElMessageBox,
+} from "element-plus";
+import "../scss/element-variables.scss";
+
+/*
+|
+| Vue New Components
+|
+*/
+import RegisterForm from "./components/client/auth/RegisterForm";
+import LoginForm from "./components/client/auth/LoginForm";
+import VerifyEmailForm from "./components/client/auth/VerifyEmailForm";
+import ToastForm from "./components/client/toast/ToastForm";
+import ForgotPasswordForm from "./components/client/auth/ForgotPasswordForm";
+import ResetPasswordForm from "./components/client/auth/ResetPasswordForm";
+import QuickToast from "./components/client/toast/QuickToast";
+import ToastList from "./components/client/toast/ToastList";
+import Profile from "./components/client/profile/Profile";
+const app = createApp({
+    components: {
+        "register-form": RegisterForm,
+        "login-form": LoginForm,
+        "verify-email-form": VerifyEmailForm,
+        "toast-form": ToastForm,
+        "forgot-password-form": ForgotPasswordForm,
+        "reset-password-form": ResetPasswordForm,
+        "quick-toast": QuickToast,
+        "toast-list": ToastList,
+        profile: Profile,
+    },
+});
+
+app.use(ElUpload);
+app.use(ElDialog);
+app.use(ElLoading);
+app.use(ElButton);
+app.use(ElPopover);
+app.use(ElMessage);
+app.use(ElSkeleton);
+app.use(ElSkeletonItem);
+app.use(ElPopconfirm);
+app.use(ElMessageBox);
+app.use(store);
+app.mount("#app");

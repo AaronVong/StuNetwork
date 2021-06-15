@@ -14,7 +14,7 @@ export default {
             try {
                 const response = await axios.get(`/toast?page=${state.page}`);
                 if (response.status == 200) {
-                    commit("toastListMutate", response.data.toasts);
+                    commit("toastListPaginateMutate", response.data.toasts);
                 }
             } catch (error) {
                 console.log(error.response);
@@ -89,10 +89,34 @@ export default {
                 console.log(error.response);
             }
         },
+
+        async getToastListUploadedByUserId({ commit }, id) {
+            try {
+                const response = await axios.post("/toast/uploaded", {
+                    user_id: id,
+                });
+                commit("setToastList", response.data.toasts);
+            } catch (error) {
+                console.log(error);
+            }
+        },
+        async getToastListLikedByUserId({ commit }, id) {
+            try {
+                const response = await axios.post("/toast/liked", {
+                    user_id: id,
+                });
+                commit("setToastList", response.data.toasts);
+            } catch (error) {
+                console.log(error);
+            }
+        },
     },
     mutations: {
+        setToastList(state, payload) {
+            state.toastList = [...payload];
+        },
         // lấy danh sách toast đã phân trang
-        toastListMutate(state, payload) {
+        toastListPaginateMutate(state, payload) {
             state.toastList = [...state.toastList, ...payload];
             state.page += 1;
         },

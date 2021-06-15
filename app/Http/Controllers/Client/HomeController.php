@@ -13,7 +13,8 @@ class HomeController extends Controller
         $this->middleware(["auth"]);
     }
 
-    public function index(){
-        return view("client/pages.home");
+    public function index(Request $request){
+        $toasts = Toast::with(["user:id,username","user.profile:user_id,fullname,avatarUrl", "files", "likes"])->orderBy("created_at", "desc")->paginate(10)->items();
+        return view("client/pages.home",["toasts" => $toasts]);
     }
 }

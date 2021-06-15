@@ -17,6 +17,8 @@ import {
     ElSkeletonItem,
     ElPopconfirm,
     ElMessageBox,
+    ElTabPane,
+    ElTabs,
 } from "element-plus";
 import "../scss/element-variables.scss";
 
@@ -58,5 +60,7 @@ app.use(ElSkeleton);
 app.use(ElSkeletonItem);
 app.use(ElPopconfirm);
 app.use(ElMessageBox);
+app.use(ElTabPane);
+app.use(ElTabs);
 app.use(store);
 app.mount("#app");

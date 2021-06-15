@@ -63,7 +63,10 @@ Route::middleware(["verified", "auth"])->group(function(){
     Route::post("/toast", [ToastController::class, "store"])->name("toast.store");
     Route::delete("/toast/{id}",[ToastController::class, "destroy"])->name("toast.destroy");
     Route::put("/toast/{id}", [ToastController::class, "update"])->name("toast.update");
-    Route::post("toast/like", [ToastController::class, "like"])->name("toast.like");
+    Route::post("/toast/like", [ToastController::class, "like"])->name("toast.like");
+    Route::post("/toast/uploaded", [ToastController::class, "toastsUploadedById"]);
+    Route::post("/toast/liked", [ToastController::class, "toastsLikedById"]);
+    Route::post("/toast/followed", [UserController::class, "profilesFollowedById"]);
 });
 
 

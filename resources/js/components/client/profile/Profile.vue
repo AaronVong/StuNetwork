@@ -47,6 +47,7 @@
             </div>
         </div>
     </div>
+    <ProfileNav :user_id="this.profile.user_id" :visitor="this.visitor" />
 </template>
 
 <script>
@@ -54,6 +55,7 @@ import EditProfileForm from "./EditProfileForm.vue";
 import ProfileBackground from "./ProfileBackground.vue";
 import ProfileInfo from "./ProfileInfo.vue";
 import ProfileFollow from "./ProfileFollow.vue";
+import ProfileNav from "./ProfileNav.vue";
 import { mapGetters, mapActions, mapMutations } from "vuex";
 export default {
     name: "Profile",
@@ -81,12 +83,14 @@ export default {
             type: Number,
             default: 0,
         },
+        visitor: Number,
     },
     components: {
         EditProfileForm,
         ProfileBackground,
         ProfileInfo,
         ProfileFollow,
+        ProfileNav,
     },
     methods: {
         ...mapActions(["getProfileAction"]),

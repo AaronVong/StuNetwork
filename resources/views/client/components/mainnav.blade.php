@@ -45,7 +45,7 @@
             <div class="bg-red-500 rounded-lg hover:bg-red-600 text-white">
                 <form action="{{ route('logout') }}" method="post" class="w-full h-full">
                     @csrf
-                    <button id="logout" class="w-full h-full px-2 py-3 z-50 focus:outline-none flex items-center" type="submit"><i class="fas fa-sign-out-alt text-2xl mr-2"></i> <span class="hidden md:block">Đăng xuất</span> <span class="hidden lg:block ml-2">{{ auth()->user()->username }}</span></button>
+                    <button id="logout" class="w-full h-full px-2 py-3 z-50 focus:outline-none flex items-center justify-center" type="submit"><i class="fas fa-sign-out-alt text-2xl md:mr-2"></i> <span class="hidden md:block">Đăng xuất</span> <span class="hidden lg:block ml-2">{{ auth()->user()->username }}</span></button>
                 </form>
             </div>
         </div>

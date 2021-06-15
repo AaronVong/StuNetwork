@@ -1,5 +1,5 @@
 <template>
-    <div class="w-full h-full" :style="styleObject"></div>
+    <div class="w-full h-full" :style="this.styleObject"></div>
 </template>
 <script>
 export default {

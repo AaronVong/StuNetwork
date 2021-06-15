@@ -73,7 +73,7 @@ export default {
                 });
             } else {
                 this.$message.error({
-                    message: "Hủy thõi profile",
+                    message: "Hủy theo dõi profile",
                 });
             }
         },

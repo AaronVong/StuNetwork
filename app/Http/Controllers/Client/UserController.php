@@ -93,4 +93,7 @@ class UserController extends Controller
                 : response(['error' => [__($status)]], 500);
     }
 
+    public function profilesFollowedById(Request $request){
+        dd($request->user_id);
+    }
 }

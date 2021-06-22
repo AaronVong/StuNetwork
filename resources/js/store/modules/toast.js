@@ -5,7 +5,8 @@ export default {
             toastList: [],
             page: 1,
             validates: {},
-            message: "",
+            errorMessage: "",
+            infoMessage: "",
         };
     },
     actions: {
@@ -14,25 +15,24 @@ export default {
             try {
                 const response = await axios.get(`/toast?page=${state.page}`);
                 if (response.status == 200) {
-                    commit("toastListPaginateMutate", response.data.toasts);
+                    commit("toastListPaginateSuccess", response.data);
                 }
             } catch (error) {
-                console.log(error.response);
+                commit("toastActionFail", error.response);
             }
+            return;
         },
-        // Thêm mới toast
+        /* Tạo mới Toast */
         async createToastAction({ commit }, formData) {
             try {
-                const response = await axios.request({
-                    method: "POST",
-                    url: "/toast",
-                    data: formData,
+                const response = await axios.post("/toast", formData, {
                     headers: {
                         "Content-Type": "multipart/form-data",
                     },
                 });
                 if (response.status == 200) {
-                    commit("createToastSuccess", response.data.toast);
+                    commit("createToastSuccess", response.data);
+                    commit("toastActionSuccess", response.data);
                 }
                 return true;
             } catch (error) {
@@ -40,29 +40,19 @@ export default {
             }
             return false;
         },
-        // xóa toast
+        /* Xóa Toast theo ID*/
         async deleteToastAction({ commit }, id) {
             try {
                 const response = await axios.delete(`/toast/${id}`);
                 if (response.status == 200) {
-                    commit("deleteToastSuccess", response.data.toastID);
+                    commit("deleteToastSuccess", response.data);
+                    commit("toastActionSuccess", response.data);
                     return true;
                 }
             } catch (error) {
-                commit("deleteToastFail", error.response.data.message);
+                commit("toastActionFail", error.response);
             }
             return false;
-        },
-        // lấy toast theo id
-        async getToastById({ commit }, id) {
-            try {
-                const response = await axios.get(`/toast/get/${id}`);
-                if (response.status == 200) {
-                    return response.data.toast;
-                }
-            } catch (error) {
-                return null;
-            }
         },
         // cập nhật toast
         async editToastAction({ commit }, { formData, id }) {
@@ -73,23 +63,36 @@ export default {
                     },
                 });
                 if (response.status == 200) {
-                    commit("editToastSuccess", response.data.toast);
+                    commit("editToastSuccess", response.data);
+                    commit("toastActionSuccess", response.data);
                 }
-                return response.data.toast;
+                return response.data.updatedToast;
             } catch (error) {
-                commit("editToastFail", error.response);
+                commit("toastActionFail", error.response);
             }
             return false;
         },
+        /* Lấy Toast theo ID*/
+        async getToastById({ commit }, id) {
+            try {
+                const response = await axios.get(`/toast/get/${id}`);
+                if (response.status == 200) {
+                    return response.data.toast;
+                }
+            } catch (error) {
+                return null;
+            }
+        },
+        /* Like Toast có với ID */
         async likeToastAction({ commit }, id) {
             try {
                 const response = await axios.post("/toast/like", { id });
                 commit("likeToastSuccess", response.data);
             } catch (error) {
-                console.log(error.response);
+                commit("toastActionFail", error.response);
             }
         },
-
+        /* Lấy danh sách Toasts được upload bởi người dùng */
         async getToastListUploadedByUserId({ commit }, id) {
             try {
                 const response = await axios.post("/toast/uploaded", {
@@ -97,9 +100,10 @@ export default {
                 });
                 commit("setToastList", response.data.toasts);
             } catch (error) {
-                console.log(error);
+                commit("toastActionFail", error.response);
             }
         },
+        /* Lấy danh sách Toasts được like bởi người dùng */
         async getToastListLikedByUserId({ commit }, id) {
             try {
                 const response = await axios.post("/toast/liked", {
@@ -107,22 +111,37 @@ export default {
                 });
                 commit("setToastList", response.data.toasts);
             } catch (error) {
-                console.log(error);
+                commit("toastActionFail", error.response);
             }
         },
     },
     mutations: {
+        toastActionFail(state, payload) {
+            if (payload.status == 422) {
+                state.validates = { ...payload.data.validates };
+            } else {
+                state.errorMessage = payload.data.message;
+            }
+        },
+        toastActionSuccess(state, payload) {
+            state.infoMessage = payload.message;
+        },
         setToastList(state, payload) {
             state.toastList = [...payload];
+            state.page += 1;
         },
         // lấy danh sách toast đã phân trang
-        toastListPaginateMutate(state, payload) {
-            state.toastList = [...state.toastList, ...payload];
+        toastListPaginateSuccess(state, payload) {
+            state.toastList.push(...payload.toasts);
             state.page += 1;
         },
         // Thêm với toast thành công
         createToastSuccess(state, payload) {
-            state.toastList.unshift(payload);
+            const regex = new RegExp("^(/toast)/[0-9]+$", "i");
+            const result = regex.test(window.location.pathname);
+            if (!result) {
+                state.toastList.unshift(payload.createdToast);
+            }
         },
         // Thêm mới toast thất bại
         createToastFail(state, payload) {
@@ -151,36 +170,28 @@ export default {
         },
         // xóa toast thành công
         deleteToastSuccess(state, payload) {
+            const regex = new RegExp("^(/toast)/[0-9]+$", "i");
+            const result = regex.test(window.location.pathname);
+            if (result) {
+                window.location.replace("/");
+                return;
+            }
             state.toastList = state.toastList.filter(
-                (item) => item.id != payload
+                (item) => item.id != payload.deletedID
             );
-        },
-        // xóa toast thất bại
-        deleteToastFail(state, payload) {
-            state.message = payload;
         },
         // cập nhật toast thành công
         editToastSuccess(state, payload) {
             state.toastList = state.toastList.map((toast, index) => {
-                if (toast.id == payload.id) {
-                    toast = { ...payload };
+                if (toast.id == payload.updatedToast.id) {
+                    toast = { ...payload.updatedToast };
                 }
                 return toast;
             });
         },
-        // cập nhật toast thất bại
-        editToastFail(state, payload) {
-            if (payload.status == 422) {
-                state.validates = { ...payload.data.validates };
-            }
-
-            if (payload.status == 404) {
-                state.message = payload.data.message;
-            }
-        },
         likeToastSuccess(state, payload) {
             state.toastList = state.toastList.map((item) => {
-                if (item.id == payload.toast_id) {
+                if (item.id == payload.toastID) {
                     if (payload.likes.length <= 0) {
                         item.likes = [];
                     } else {
@@ -195,11 +206,17 @@ export default {
         toastList(state) {
             return state.toastList;
         },
-        message(state) {
-            return state.message;
-        },
-        validates(state) {
+        toastValidates(state) {
             return state.validates;
+        },
+        toastInfoMessage(state) {
+            return state.infoMessage;
+        },
+        toastValidates(state) {
+            return state.validates;
+        },
+        toastErrorMessage(state) {
+            return state.errorMessage;
         },
     },
 };

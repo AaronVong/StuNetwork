@@ -38,6 +38,9 @@
                 <ProfileInfo
                     :username="this.username"
                     :rolename="this.rolename.join(',')"
+                    :followingcount="this.followingcount"
+                    :followedcount="this.followedcount"
+                    :toastcount="this.toastcount"
                 />
                 <ProfileFollow
                     v-if="!this.owned"
@@ -47,7 +50,11 @@
             </div>
         </div>
     </div>
-    <ProfileNav :user_id="this.profile.user_id" :visitor="this.visitor" />
+    <ProfileNav
+        :user_id="this.profile.user_id"
+        :visitor="this.visitor"
+        :owned="this.owned"
+    />
 </template>
 
 <script>
@@ -67,8 +74,8 @@ export default {
     },
     props: {
         owned: {
-            type: Number,
-            default: 0,
+            type: Boolean,
+            default: false,
         },
         username: {
             type: String,
@@ -80,10 +87,13 @@ export default {
         },
         user_profile: Object,
         followable: {
-            type: Number,
-            default: 0,
+            type: Boolean,
+            default: false,
         },
         visitor: Number,
+        followingcount: Number,
+        followedcount: Number,
+        toastcount: Number,
     },
     components: {
         EditProfileForm,

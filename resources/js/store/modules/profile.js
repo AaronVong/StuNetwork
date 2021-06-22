@@ -6,6 +6,7 @@ const toast = {
             message: "",
             profile: {},
             followed: false,
+            followings: [],
         };
     },
     actions: {
@@ -40,8 +41,21 @@ const toast = {
                 // commit("handleError", error.response);
             }
         },
+        async getProfilesFollowedByUserId({ commit }, id) {
+            try {
+                const response = await axios.post("/proifle/followings", {
+                    id,
+                });
+                commit("setFollowingsList", response.data.followings);
+            } catch (error) {
+                console.log(error);
+            }
+        },
     },
     mutations: {
+        setFollowingsList(state, payload) {
+            state.followings = [...payload];
+        },
         setFollowState(state, payload) {
             state.followed = payload;
         },
@@ -72,6 +86,9 @@ const toast = {
         },
         followed(state) {
             return state.followed;
+        },
+        followings(state) {
+            return state.followings;
         },
     },
 };

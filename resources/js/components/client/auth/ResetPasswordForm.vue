@@ -6,8 +6,14 @@
         v-loading="this.loading"
         element-loading-text="Đang xử lý, vui lòng chở..."
     >
-        <div class="text-red-600 text-center mb-3" v-if="this.message">
-            <span>{{ this.message }}</span>
+        <div class="text-red-600 text-center mb-3" v-if="this.authErrorMessage">
+            <span>{{ this.authErrorMessage }}</span>
+        </div>
+        <div
+            class="text-green-600 text-center mb-3 font-bold"
+            v-if="this.authInfoMessage"
+        >
+            <span>{{ this.authInfoMessage }}</span>
         </div>
         <div class="flex flex-col mb-3">
             <label for="email" class="mb-3 text-lg font-bold text-gray-500"
@@ -30,8 +36,8 @@
                 placeholder="Nhập địa chỉ email..."
                 v-model="this.form.email"
             />
-            <span class="text-red-500" v-if="this.validates.email">
-                {{ this.validates.email.shift() }}
+            <span class="text-red-500" v-if="this.authValidates.email">
+                {{ [...this.authValidates.email].shift() }}
             </span>
         </div>
         <div class="flex flex-col mb-3">
@@ -57,8 +63,8 @@
                 placeholder="Nhập mật khẩu..."
                 v-model="this.form.password"
             />
-            <span class="text-red-500" v-if="this.validates.password">
-                {{ this.validates.password.shift() }}
+            <span class="text-red-500" v-if="this.authValidates.password">
+                {{ [...this.authValidates.password].shift() }}
             </span>
         </div>
         <div class="flex flex-col mb-3">
@@ -84,6 +90,12 @@
                 placeholder="Nhập lại mật khẩu..."
                 v-model="this.form.password_confirmation"
             />
+            <span
+                class="text-red-500"
+                v-if="this.authValidates.password_confirmation"
+            >
+                {{ [...this.authValidates.password_confirmation].shift() }}
+            </span>
         </div>
         <div class="flex mb-3 justify-center items-center">
             <button
@@ -105,7 +117,7 @@
     </form>
 </template>
 <script>
-import axios from "axios";
+import { mapActions, mapGetters } from "vuex";
 export default {
     name: "ResetPasswordForm",
     data() {
@@ -116,43 +128,25 @@ export default {
                 password_confirmation: "",
                 token: "",
             },
-            validates: {},
-            message: null,
             loading: false,
         };
     },
     props: {
-        native_route: String,
         token: String,
     },
+    computed: {
+        ...mapGetters(["authValidates", "authErrorMessage", "authInfoMessage"]),
+    },
     methods: {
+        ...mapActions(["resetPassword"]),
         async handleSubmit(e) {
             e.preventDefault();
             this.loading = true;
             this.form.token = this.token;
-            try {
-                console.log(this.native_route);
-                const response = await axios.post(this.native_route, {
-                    ...this.form,
-                });
-                this.message = response.data.message;
-                setTimeout(() => {
-                    window.location.replace(response.data.next);
-                }, 1000);
-            } catch (error) {
-                if (error.response.status == 422) {
-                    this.validates = {
-                        ...error.response.data.validates,
-                    };
-                }
-
-                if (error.response.status == 500) {
-                    this.message = error.response.data.error.shift();
-                }
-                this.form.password = "";
-                this.form.password_confirmation = "";
-            }
+            await this.resetPassword({ formData: this.form });
             this.loading = false;
+            this.form.password = "";
+            this.form.password_confirmation = "";
         },
     },
 };

@@ -56,6 +56,7 @@ Route::middleware(["verified", "auth"])->group(function(){
     Route::put("/profile/{username}", [ProfileController::class, "updateProfile"])->name("profile.update");
     Route::post("/profile/follow", [ProfileController::class, "follow"])->name("profile.follow");
     Route::post("/profile/followed", [ProfileController::class, "followed"]);
+    Route::post("/proifle/followings", [UserController::class, "profilesFollowedById"]);
 
     Route::get("/toast", [ToastController::class, "paginate"])->name("toast.paginate");
     Route::get("/toast/{id}", [ToastController::class, "index"])->name("toast");

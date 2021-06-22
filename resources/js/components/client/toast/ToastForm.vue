@@ -2,15 +2,14 @@
     <form
         method="post"
         enctype="multipart/form-data"
-        id="toast-form"
         class="w-full"
         @submit="this.handleToastSubmit"
     >
         <div>
             <!-- Message Place Here-->
-            <span class="text-red-500 font-bold" v-if="this.message != ''">
-                {{ this.message }}
-            </span>
+            <!-- <span class="text-red-500 font-bold" v-if="this.toastErrorMessage">
+                {{ this.toastErrorMessage }}
+            </span> -->
             <textarea
                 v-model="this.form.content"
                 class="
@@ -21,7 +20,6 @@
                     text-lg text-black
                 "
                 placeholder="Chia sẽ những gì bạn nghĩ..."
-                form="toast-form"
                 rows="3"
                 name="content"
             ></textarea>
@@ -69,14 +67,17 @@
         </div>
         <!-- Validates place here -->
         <div class="text-left">
-            <span class="text-red-500" v-if="this.validates.content">
-                {{ this.validates.content.shift() }}
+            <span class="text-red-500" v-if="this.toastValidates.content">
+                {{ this.toastValidates.content.shift() }}
             </span>
-            <span class="text-red-500" v-if="this.validates.subfile">
-                {{ this.validates.subfile.shift() }}
+            <span class="text-red-500" v-if="this.toastValidates.subfile">
+                {{ this.toastValidates.subfile.shift() }}
             </span>
-            <span class="text-red-500" v-if="this.validates['files_upload']">
-                {{ this.validates["files_upload"].shift() }}
+            <span
+                class="text-red-500"
+                v-if="this.toastValidates['files_upload']"
+            >
+                {{ this.toastValidates["files_upload"].shift() }}
             </span>
         </div>
     </form>
@@ -128,7 +129,11 @@ export default {
         },
     },
     computed: {
-        ...mapGetters(["message", "validates"]),
+        ...mapGetters([
+            "toastValidates",
+            "toastErrorMessage",
+            "toastInfoMessage",
+        ]),
     },
     components: { FileUpload },
     methods: {
@@ -174,6 +179,7 @@ export default {
                     fullscreen: true,
                     text: "Đang xử lý, vui lòng chờ...",
                 });
+                let ok = false;
                 // Edit toast case
                 if (
                     this.native_method === "PUT" ||
@@ -181,35 +187,34 @@ export default {
                 ) {
                     // Dặt put method cho laravel hiểu
                     formData.set("_method", "PUT");
-                    const ok = await this.editToastAction({
+                    ok = await this.editToastAction({
                         formData,
                         id: this.toastID,
                     });
-                    if (ok !== false) {
+                    if (ok) {
                         this.$emit("toastEdited");
-                        this.$message.success({
-                            message: "Toast đã được cập nhật!",
-                            duration: 2000,
-                        });
-                        // cập nhật thông tin toast trên form
                         this.form.content = ok.content;
                         this.form.fileList = [...ok.files];
                     }
                 } else {
                     // Create toast case
-                    const ok = await this.createToastAction(formData);
+                    ok = await this.createToastAction(formData);
                     if (ok) {
-                        // reset local data
+                        this.$emit("toastCreated");
                         this.form.content = "";
                         this.form.fileList = [];
-                        // close dialog when toast created
-                        this.$emit("toastCreated");
-                        // show some message
-                        this.$message.success({
-                            message: "Toast đã được thêm!",
-                            duration: 2000,
-                        });
                     }
+                }
+                if (ok !== false) {
+                    this.$message.success({
+                        message: this.toastInfoMessage,
+                        duration: 2000,
+                    });
+                } else {
+                    this.$message.error({
+                        message: this.toastErrorMessage,
+                        duration: 2000,
+                    });
                 }
                 loading.close();
             }

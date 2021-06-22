@@ -26,6 +26,10 @@ class ToastPolicy
     }
 
     public function owned(User $actor, Toast $toast){
-        return $actor->id === $toast->user_id ? Response::allow() : Response::deny("Bạn không có quyền xóa toast này!");
+        return $actor->id === $toast->user_id ? Response::allow() : Response::deny("Bạn không sở hữu toast này!");
+    }
+
+    public function update(User $actor, Toast $toast){
+        return $actor->id === $toast->user_id ? Response::allow() : Response::deny("Bạn không có quyền cập nhật toast này!");
     }
 }

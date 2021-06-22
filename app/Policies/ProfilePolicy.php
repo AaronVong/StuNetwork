@@ -25,6 +25,6 @@ class ProfilePolicy
     }
 
     public function follow(User $actor, Profile $profile){
-        return ($actor->id != $profile->user->user_id) ? Response::allow() : Response::deny("Không thể theo dõi profile này");
+        return ($actor->profile->id != $profile->id) ? Response::allow() : Response::deny("Không thể theo dõi profile này");
     }
 }

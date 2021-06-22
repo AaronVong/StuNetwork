@@ -9,7 +9,9 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
 use Illuminate\Auth\Events\PasswordReset;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class UserController extends Controller
 {
@@ -52,9 +54,8 @@ class UserController extends Controller
         # Gửi email thành công
         if($status === Password::RESET_LINK_SENT)
             return response(["message" => __($status)], 200);
-        return response(["error" => [__($status)]], 500);
+        return response(["message" => [__($status)]], 500);
     }
-
 
     # View khôi phục mật khẩu
     public function resetPasswordForm($token){
@@ -90,10 +91,15 @@ class UserController extends Controller
         // Reset password thành công?
         return $status == Password::PASSWORD_RESET
                 ? response(['message'=> __($status), "next" => route('login')],200)
-                : response(['error' => [__($status)]], 500);
+                : response(['message' => [__($status)]], 500);
     }
 
     public function profilesFollowedById(Request $request){
-        dd($request->user_id);
+        $user = User::find($request->id);
+        if($user){
+            $followings = DB::table("profiles")->join("users", "users.id", "=","profiles.user_id")->join("user_follows", "user_follows.following_id", "=","profiles.id")->where("user_follows.follower_id","=",$request->id)->select("profiles.*","users.username")->get();
+            return response(["followings" => $followings], 200);
+        }
+        return response(["message" => "Không tìm thấy người dùng"],404);
     }
 }

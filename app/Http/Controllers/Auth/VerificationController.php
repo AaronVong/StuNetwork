@@ -37,9 +37,9 @@ class VerificationController extends Controller
     # Xử lý yêu câu gửi lại mail xác minh
     function sendEmailVerification(Request $request){
         if($request->user()->email_verified_at != null){
-            return response(["status" => false, "next" => route("home")], 200);
+            return response(["next" => route("home")], 200);
         }
         $request->user()->sendEmailVerificationNotification();
-        return response(["message" => "Đường dẫn xác minh đã được gủi!", "status" => true], 200);
+        return response(["message" => "Đường dẫn xác minh đã được gủi!"], 200);
     }
 }

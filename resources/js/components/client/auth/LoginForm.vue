@@ -15,9 +15,14 @@
         <i class="text-sm block text-center text-gray-600">
             Sức khỏe - Trí tuệ - Ước vọng
         </i>
-        <div class="text-red-600 text-center mb-3">
-            <!-- Login Status Here -->
-            {{ this.message }}
+        <div class="text-red-600 text-center mb-3" v-if="this.authErrorMessage">
+            {{ this.authErrorMessage }}
+        </div>
+        <div
+            class="text-green-600 text-center mb-3 font-bold"
+            v-if="this.authInfoMessage"
+        >
+            {{ this.authInfoMessage }}
         </div>
         <div class="flex flex-col mb-3">
             <label for="email" class="mb-3 text-lg font-bold text-gray-500"
@@ -40,8 +45,9 @@
                 placeholder="Nhập địa chỉ email..."
                 v-model="this.form.email"
             />
-            <span class="text-red-500" v-if="this.validates.email">
-                {{ this.validates.email.shift() }}
+            <span class="text-red-500" v-if="this.authValidates.email">
+                <!-- Safely get first element without changing state -->
+                {{ [...this.authValidates.email].shift() }}
             </span>
         </div>
         <div class="flex flex-col mb-3">
@@ -67,8 +73,9 @@
                 placeholder="Nhập mật khẩu..."
                 v-model="this.form.password"
             />
-            <span class="text-red-500" v-if="this.validates.password">
-                {{ this.validates.password.shift() }}
+            <span class="text-red-500" v-if="this.authValidates.password">
+                <!-- Safely get first element without changing state -->
+                {{ [...this.authValidates.password].shift() }}
             </span>
         </div>
         <div class="flex items-center mb-3">
@@ -126,6 +133,7 @@
     </form>
 </template>
 <script>
+import { mapActions, mapGetters } from "vuex";
 export default {
     name: "LoginForm",
     data() {
@@ -136,39 +144,21 @@ export default {
                 remember: false,
             },
             loading: false,
-            validates: {},
-            message: "",
         };
     },
+    computed: {
+        ...mapGetters(["authValidates", "authErrorMessage", "authInfoMessage"]),
+    },
     methods: {
+        ...mapActions(["login"]),
         async handleLogin(e) {
             e.preventDefault();
             this.loading = true;
-            try {
-                const response = await axios.post(
-                    this.native_route,
-                    { ...this.form },
-                    {
-                        headers: {
-                            "Content-Type": "application/json",
-                        },
-                    }
-                );
-                if (response.status == 200) {
-                    window.location.replace(response.data.next);
-                }
-            } catch (error) {
-                if (error.response.status == 422) {
-                    this.validates = { ...error.response.data.validates };
-                } else {
-                    this.message = error.response.data.message;
-                }
-            }
+            await this.login({ formData: this.form });
             this.loading = false;
         },
     },
     props: {
-        native_route: String,
         register_route: String,
         password_route: String,
     },

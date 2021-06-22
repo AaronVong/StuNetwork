@@ -33,6 +33,37 @@
                 >
                     <i class="far fa-edit mr-2"></i> Sửa bài
                 </button>
+                <div
+                    v-if="!this.owned"
+                    class="flex justify-center items-center"
+                >
+                    <button
+                        v-if="!this.followable"
+                        @click.prevent="this.handleFollow"
+                        type="button"
+                        class="
+                            text-center
+                            focus:outline-none
+                            hover:text-blue-500
+                            cursor-pointer
+                        "
+                    >
+                        Theo dõi
+                    </button>
+                    <button
+                        v-else
+                        @click.prevent="this.handleFollow"
+                        type="button"
+                        class="
+                            text-center
+                            focus:outline-none
+                            hover:text-red-500
+                            cursor-pointer
+                        "
+                    >
+                        Hủy theo dõi
+                    </button>
+                </div>
             </div>
             <template #reference>
                 <el-button class="cursor-pointer focus:outline-none">
@@ -69,7 +100,7 @@
 </template>
 
 <script>
-import { mapActions } from "vuex";
+import { mapActions, mapGetters } from "vuex";
 import ToastForm from "./ToastForm.vue";
 export default {
     name: "ToastTools",
@@ -77,6 +108,7 @@ export default {
         return {
             toolsBoxVisible: false,
             editToastVisible: false,
+            followable: false,
         };
     },
     props: {
@@ -85,9 +117,14 @@ export default {
             type: Number,
             default: -1,
         },
+        followed: Boolean,
+        profileID: Number,
+    },
+    computed: {
+        ...mapGetters(["toastInfoMessage", "toastErrorMessage"]),
     },
     methods: {
-        ...mapActions(["deleteToastAction"]),
+        ...mapActions(["deleteToastAction", "toggleFollow"]),
         toggleToolsBox() {
             this.toolsBoxVisible = !this.toolsBoxVisible;
         },
@@ -112,17 +149,24 @@ export default {
                 if (ok) {
                     this.$message({
                         type: "success",
-                        message: "Xóa toast thành công!",
+                        message: this.toastInfoMessage,
                     });
                 } else {
                     this.$message({
-                        type: "success",
-                        message: "Xóa toast thất bại!",
+                        type: "error",
+                        message: this.toastErrorMessage,
                     });
                 }
                 loading.close();
             });
         },
+        async handleFollow() {
+            await this.toggleFollow(this.profileID);
+            this.followable = !this.followable;
+        },
+    },
+    updated() {
+        this.followable = this.followed;
     },
     components: { ToastForm },
 };

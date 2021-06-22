@@ -12,11 +12,7 @@
             cập email và click vào đường dẫn mà chúng tôi đã gửi, để hoàn thành
             đăng ký và kích hoạt tài khoản.
         </p>
-        <form
-            :action="`${this.native_route}`"
-            method="post"
-            @submit="this.handleSendEmail"
-        >
+        <form method="post" @submit="this.handleSendEmail">
             <div class="flex mb-3 justify-center items-center">
                 <label
                     for="password"
@@ -39,8 +35,17 @@
                     Gửi lại mail cho tôi
                 </button>
             </div>
-            <div class="text-red-600 text-center" v-if="this.status === true">
-                {{ this.message }}
+            <div
+                class="text-green-600 text-center font-bold"
+                v-if="this.authInfoMessage"
+            >
+                {{ this.authInfoMessage }}
+            </div>
+            <div
+                class="text-green-600 text-center"
+                v-if="this.authErrorMessage"
+            >
+                {{ this.authErrorMessage }}
             </div>
         </form>
         <p class="mb-3 font-normal text-lg md:text-black">
@@ -52,38 +57,25 @@
 </template>
 
 <script>
-import axios from "axios";
+import { mapActions, mapGetters } from "vuex";
 export default {
     name: "VerifyEmailForm",
     data() {
         return {
-            status: "",
-            message: "",
             loading: false,
         };
     },
+    computed: {
+        ...mapGetters(["authValidates", "authErrorMessage", "authInfoMessage"]),
+    },
     methods: {
+        ...mapActions(["sendVerificationEmail"]),
         async handleSendEmail(e) {
             e.preventDefault();
             this.loading = true;
-            try {
-                const response = await axios.post(`${this.native_route}`);
-                if (response.status == 200) {
-                    if (response.data.status == true) {
-                        this.status = response.data.status;
-                        this.message = response.data.message;
-                    } else {
-                        window.location.replace(response.data.next);
-                    }
-                }
-            } catch (error) {
-                console.log(error.response.data);
-            }
-            this.loading = true;
+            await this.sendVerificationEmail();
+            this.loading = false;
         },
-    },
-    props: {
-        native_route: String,
     },
 };
 </script>

@@ -19,6 +19,7 @@ import {
     ElMessageBox,
     ElTabPane,
     ElTabs,
+    ElInfiniteScroll,
 } from "element-plus";
 import "../scss/element-variables.scss";
 
@@ -36,6 +37,7 @@ import ResetPasswordForm from "./components/client/auth/ResetPasswordForm";
 import QuickToast from "./components/client/toast/QuickToast";
 import ToastList from "./components/client/toast/ToastList";
 import Profile from "./components/client/profile/Profile";
+import Toast from "./components/client/toast/Toast";
 const app = createApp({
     components: {
         "register-form": RegisterForm,
@@ -46,6 +48,7 @@ const app = createApp({
         "reset-password-form": ResetPasswordForm,
         "quick-toast": QuickToast,
         "toast-list": ToastList,
+        toast: Toast,
         profile: Profile,
     },
 });
@@ -62,5 +65,6 @@ app.use(ElPopconfirm);
 app.use(ElMessageBox);
 app.use(ElTabPane);
 app.use(ElTabs);
+app.use(ElInfiniteScroll);
 app.use(store);
 app.mount("#app");

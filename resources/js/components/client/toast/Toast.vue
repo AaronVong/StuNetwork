@@ -1,5 +1,5 @@
 <template>
-    <div class="toast p-3 hover:bg-gray-50 transition-colors">
+    <div class="toast p-3 hover:bg-gray-50 transition-colors list-item">
         <div class="toast__head w-full flex mb-3">
             <div class="flex-grow-0 flex-shrink-0 max-w-xs mr-2">
                 <img
@@ -32,7 +32,12 @@
                 }}</span>
             </div>
             <!-- Tools -->
-            <ToastTools :owned="this.owned" :toastID="toast.id" />
+            <ToastTools
+                :owned="this.owned"
+                :toastID="this.toast.id"
+                :followed="this.followed"
+                :profileID="this.toast.user.profile.id"
+            />
         </div>
         <div class="toast__body w-full mb-3 px-3 min-h-full">
             <div class="mb-3">
@@ -132,6 +137,7 @@ export default {
         toast: Object,
         owned: Boolean,
         liked: Boolean,
+        followed: Boolean,
     },
     components: { ToastFile, ToastTools },
     mounted() {

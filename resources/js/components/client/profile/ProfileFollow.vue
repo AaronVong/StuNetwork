@@ -57,7 +57,7 @@ export default {
         };
     },
     props: {
-        followable: Number,
+        followable: Boolean,
         profile_id: Number,
     },
     methods: {

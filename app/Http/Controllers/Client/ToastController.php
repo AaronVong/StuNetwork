@@ -34,8 +34,16 @@ class ToastController extends Controller
     }
 
     public function getToastById($id){
-        $toast = Toast::with(["user:id,username","user.profile:user_id,fullname,avatarUrl", "files", "likes"])->where("id", $id)->first();
+        $toast = Toast::with(["user:id,username","user.profile:user_id,fullname,avatarUrl", "files", "likes"])->where("id", $id)->get();
         return $toast;
+    }
+
+    public function getToast(Request $request, $id){
+        if(!$request->ajax()){
+            return throw new HttpException(404);
+        }
+        $toast = $this->getToastById($id);
+        return $toast ? response(["toast" => $toast->first()],200) : response(["message" => "Toast không tồn tại",404]);
     }
 
     public function getToastsUploadedByUserId($id){
@@ -47,42 +55,45 @@ class ToastController extends Controller
         $toasts = Toast::with(["user:id,username","user.profile:user_id,fullname,avatarUrl", "files", "likes"])->whereHas("likes", function ($query) use($id) {return $query->where("user_id", $id);})->orderBy("created_at", "desc")->get();
         return $toasts;
     }
-    # Lấy toast theo id
-    public function index(Request $req, $id){
+
+    public function index(Request $request, $id){
         # Tìm toast
         $toast = $this->getToastById($id);
+        // $response = Gate::inspect("follow", $toast->user()->first()->profile);
+        // $followed = $request->user()->followings()->where("following_id", "=", $toast->user_id)->first() ? true: false;
+        // $liked = $toast->likedBy($request->user());
         # Trả về kết quả
-        return throw new HttpException(404);
+        return $toast ? view("client/pages.toast", ["toast" => $toast]) : throw new HttpException(404);
     }
 
-    public function paginate(Request $req){
-        if(!$req->ajax()){
+    public function paginate(Request $request){
+        if(!$request->ajax()){
             throw new HttpException(404);
         }
         $toasts = Toast::with(["user:id,username","user.profile:user_id,fullname,avatarUrl", "files", "likes"])->orderBy("created_at", "desc")->paginate(10)->items();
-        if(count($toasts) > 0){
-            return response(["toasts" => $toasts], 200);
-        }
-        return response([], 204);
+        return count($toasts) > 0 ? response(["toasts" => $toasts], 200) : response(["message" => "Không còn toast"], 204);
     }
 
     # Lưu trữ toast
-    public function store(Request $req){
-        $validator = Validator::make($req->all(), $this->rules, $this->messages);
+    public function store(Request $request){
+        if(!$request->ajax()){
+            throw new HttpException(404);
+        }
+        $validator = Validator::make($request->all(), $this->rules, $this->messages);
         
         if($validator->fails()){
             return response(["validates" => $validator->errors()], 422);
         }
 
-        $toast = $req->user()->toasts()->create([
-            "content" => $req->content
+        $toast = $request->user()->toasts()->create([
+            "content" => $request->content
         ]);
         if($toast==null){
             return response(["message" => "Không thể tạo toast!"], 500);
         }
         # Upload file lên Drive, đồng thời lưu trữ thông tin file vào CSDL
-        if($req->hasFile("files_upload")){
-            $fileArray = $req->file("files_upload");
+        if($request->hasFile("files_upload")){
+            $fileArray = $request->file("files_upload");
             foreach ($fileArray as $key => $file) {
                 $folderID = env("GOOGLE_DRIVE_TOAST_FILES_FOLDER_ID");
                 $result = $this->uploadFile($file, $folderID);
@@ -99,11 +110,14 @@ class ToastController extends Controller
             }
         }
         # Trả về toast vừa tạo
-        return response(["status"=> true, "toast" => $this->getToastById($toast->id)],200);
+        return response(["message"=>"Toast đã được đăng","createdToast" => $this->getToastById($toast->id)->first()],200);
     }
 
     # Xóa toast
-    public function destroy(Request $req, $id){
+    public function destroy(Request $request, $id){
+        if(!$request->ajax()){
+            throw new HttpException(404);
+        }
         # Tìm toast
         $toast = Toast::where("id", $id)->first();
         if($toast!= null){
@@ -116,7 +130,7 @@ class ToastController extends Controller
                     Storage::delete($folderID."/".$file->id);
                 }
                 $toast->delete();
-                return response(["message" => "Xóa thành công", "toastID" => $toast->id], 200);
+                return response(["message" => "Toast đã được xóa", "deletedID" => $toast->id], 200);
             }else{
                 return response(["message"=>$response->message()], 401);
             }
@@ -125,9 +139,12 @@ class ToastController extends Controller
     }
 
     # Cập nhật toast
-    public function update(Request $req, $id){
+    public function update(Request $request, $id){
+        if(!$request->ajax()){
+            throw new HttpException(404);
+        }
         # Validate dữ liệu
-        $validator = Validator::make($req->only("content", "files_upload"), $this->rules, $this->messages);
+        $validator = Validator::make($request->only("content", "files_upload"), $this->rules, $this->messages);
         
         # Validate thất bại
         if($validator->fails()){
@@ -136,24 +153,27 @@ class ToastController extends Controller
         $toast = Toast::find($id);
         # Toast không tồn tại
         if(!$toast){
-            return response(["message" => "Không tìm thấy bài đăng!"], 404);
+            return response(["message" => "Toast không tồn tại!"], 404);
 
+        }
+
+        # Kiểm tra quyền
+        $response = Gate::inspect("update", $toast);
+        if(!$response->allowed()){
+            return response(["message" => $response->message()],401);
         }
 
         # Xóa file bị xóa
-        $deletedFiles = json_decode($req->deletedFiles); # mảng id file đã bị xóa
+        $deletedFiles = json_decode($request->deletedFiles); # mảng id file đã bị xóa
         $folderID = env("GOOGLE_DRIVE_TOAST_FILES_FOLDER_ID");
         foreach($deletedFiles as $key => $value){
-            # xóa khỏi drive
             Storage::delete($folderID."/".$value);
-            # xóa khỏi database
             $toast->files()->where("id", "like", $value)->delete();
         }
-        
-        $toast->content = $req->content;
+        $toast->content = $request->content;
         # thêm hình ảnh mới (nếu có)
-        if($req->hasFile("files_upload")){
-            $fileArray = $req->file("files_upload");
+        if($request->hasFile("files_upload")){
+            $fileArray = $request->file("files_upload");
             foreach ($fileArray as $key => $file) {
                 $result = $this->uploadFile($file, $folderID);
                 if($result !== false){
@@ -165,29 +185,36 @@ class ToastController extends Controller
                         "name" => $file->getClientOriginalName()
                     ]);
                 }
-                # Chưa bắt trường hợp upload fail
             }
         }
         $toast->save();
-        $updatedToast = $this->getToastById($toast->id);
-        return  $result ? response(["toast" => $updatedToast]) : response(["message" => "Toast không tồn tại"], 404);
+        return response(["message"=>"Toast đã được cập nhật","updatedToast" => $this->getToastById($toast->id)->first()],200);
     }
 
     public function like(Request $request){
+        if(!$request->ajax()){
+            throw new HttpException(404);
+        }
         $toast = Toast::find($request->id);
         if($toast==null){
             return response(["message" => "Không tìm thấy toast"], 404);
         }
         $request->user()->toggleLike($toast);
-        return response(["likes" => $toast->likes, "toast_id" => $toast->id],200);
+        return response(["likes" => $toast->likes, "toastID" => $toast->id],200);
     }
 
     public function toastsUploadedById(Request $request){
+        if(!$request->ajax()){
+            throw new HttpException(404);
+        }
         $toasts = $this->getToastsUploadedByUserId($request->user_id);
         return $toasts ? response(["toasts" => $toasts], 200):response(["message" => "Không tìm thấy người dùng!", "toasts"=>[]], 404);
     }
 
     public function toastsLikedById(Request $request){
+        if(!$request->ajax()){
+            throw new HttpException(404);
+        }
         $toasts = $this->getToastsLikedByUserId($request->user_id);
         return $toasts ? response(["toasts" => $toasts], 200):response(["message" => "Không tìm thấy người dùng!", "toasts"=>[]], 404);
     }

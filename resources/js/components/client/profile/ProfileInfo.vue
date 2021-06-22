@@ -7,6 +7,11 @@
             <h6 class="text-normal text-gray-600">
                 {{ this.username }}
             </h6>
+            <div class="text-gray-600 flex flex-wrap gap-2">
+                <span>Toast đã đăng: {{ this.toastcount }}</span>
+                <span>Đã theo dõi: {{ this.followingcount }}</span>
+                <span>Lượt theo dõi: {{ this.followedcount }}</span>
+            </div>
             <p class="text-gray-600">
                 <i class="fas fa-venus-mars mr-2"></i
                 >{{
@@ -60,6 +65,9 @@ export default {
     props: {
         rolename: String,
         username: String,
+        followingcount: Number,
+        followedcount: Number,
+        toastcount: Number,
     },
     computed: {
         ...mapGetters(["profile"]),

@@ -6,5 +6,5 @@
 <i class="text-sm block text-center text-gray-600">
     Sức khỏe - Trí tuệ - Ước vọng
 </i>
-<reset-password-form :native_route="'{{ route('password.update') }}'" :token="'{{ $token }}'"></reset-password-form>
+<reset-password-form :token="'{{ $token }}'"></reset-password-form>
 @endsection

@@ -118,7 +118,7 @@ class ProfileController extends Controller
         $profile = Profile::find($request->following_id);
         if($profile){
             $response = Gate::inspect("follow", $profile);
-            if($response->allow()){
+            if($response->allowed()){
                 $isFollowed = $request->user()->followings()->where("following_id", $request->following_id)->first() == null ? false : true;
                 if($isFollowed){
                     $request->user()->followings()->detach($request->following_id);

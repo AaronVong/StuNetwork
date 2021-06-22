@@ -1,7 +1,6 @@
 <template>
     <form
         class="w-full h-full p-4"
-        :action="`${this.native_route}`"
         method="post"
         v-loading="this.loading"
         element-loading-text="Đang xử lý, vui lòng chở..."
@@ -16,9 +15,14 @@
         <i class="text-sm block text-center text-gray-600">
             Sức khỏe - Trí tuệ - Ước vọng
         </i>
-        <div class="text-red-600 text-center mb-3">
-            <!-- Register Status Here -->
-            {{ this.message }}
+        <div class="text-red-600 text-center mb-3" v-if="this.authErrorMessage">
+            {{ this.authErrorMessage }}
+        </div>
+        <div
+            class="text-green-600 text-center mb-3 font-bold"
+            v-if="authInfoMessage"
+        >
+            {{ this.authInfoMessage }}
         </div>
         <div class="flex flex-col mb-3">
             <label for="username" class="mb-3 text-lg font-bold text-gray-500"
@@ -42,8 +46,8 @@
                 v-model="this.form.fullname"
             />
             <!-- Username Validation Error -->
-            <span class="text-red-600" v-if="this.validates.fullname">
-                {{ this.validates.fullname.shift() }}
+            <span class="text-red-600" v-if="this.authValidates.fullname">
+                {{ [...this.authValidates.fullname].shift() }}
             </span>
         </div>
         <div class="flex flex-col mb-3">
@@ -68,8 +72,8 @@
                 v-model="this.form.username"
             />
             <!-- Username Validation Error -->
-            <span class="text-red-600" v-if="this.validates.username">
-                {{ this.validates.username.shift() }}
+            <span class="text-red-600" v-if="this.authValidates.username">
+                {{ [...this.authValidates.username].shift() }}
             </span>
         </div>
         <div class="flex flex-col mb-3">
@@ -94,8 +98,8 @@
                 v-model="this.form.email"
             />
             <!-- Email Validation Error -->
-            <span class="text-red-600" v-if="this.validates.email">
-                {{ this.validates.email.shift() }}
+            <span class="text-red-600" v-if="this.authValidates.email">
+                {{ [...this.authValidates.email].shift() }}
             </span>
         </div>
         <div class="flex flex-col mb-3">
@@ -122,8 +126,8 @@
                 v-model="this.form.password"
             />
             <!-- Password Validation Error -->
-            <span class="text-red-600" v-if="this.validates.password">
-                {{ this.validates.password.shift() }}
+            <span class="text-red-600" v-if="this.authValidates.password">
+                {{ [...this.authValidates.password].shift() }}
             </span>
         </div>
         <div class="flex flex-col mb-3">
@@ -152,9 +156,9 @@
             <!-- Password Confirmation Validation Error -->
             <span
                 class="text-red-600"
-                v-if="this.validates.password_confirmation"
+                v-if="this.authValidates.password_confirmation"
             >
-                {{ this.validates.password_confirmation.shift() }}
+                {{ [...this.authValidates.password_confirmation].shift() }}
             </span>
         </div>
         <div class="flex mb-3 justify-center items-center">
@@ -185,10 +189,21 @@
                 </a>
             </p>
         </div>
+        <div class="flex justify-center items-center mb-3 text-gray-600">
+            <p>
+                Quên mật khẩu?
+                <a
+                    :href="`${this.password_route}`"
+                    class="underline text-blue-700 hover:text-blue-600 ml-2"
+                >
+                    Khôi phục mật khẩu
+                </a>
+            </p>
+        </div>
     </form>
 </template>
 <script>
-import axios from "axios";
+import { mapGetters, mapActions } from "vuex";
 export default {
     name: "RegisterForm",
     data() {
@@ -200,40 +215,22 @@ export default {
                 password: "",
                 password_confirmation: "",
             },
-            validates: {},
             loading: false,
-            message: "",
         };
     },
+    computed: {
+        ...mapGetters(["authValidates", "authErrorMessage", "authInfoMessage"]),
+    },
     props: {
-        native_route: String,
         login_route: String,
+        password_route: String,
     },
     methods: {
+        ...mapActions(["register"]),
         async handleRegister(e) {
             e.preventDefault();
             this.loading = true;
-            try {
-                const response = await axios.post(
-                    `${this.native_route}`,
-                    { ...this.form },
-                    {
-                        headers: {
-                            "Content-Type": "application/json",
-                        },
-                    }
-                );
-                if (response.status == 200) {
-                    window.location.replace(`${response.data.next}`);
-                }
-            } catch (error) {
-                if (error.response.status == 406) {
-                    this.message = error.response.data.message;
-                }
-                if (error.response.status == 422) {
-                    this.validates = { ...error.response.data.validates };
-                }
-            }
+            await this.register({ formData: this.form });
             this.loading = false;
         },
     },

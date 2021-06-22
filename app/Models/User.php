@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\CanResetPassword;
+use Illuminate\Support\Facades\DB;
 use Overtrue\LaravelLike\Traits\Liker;
 
 class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
@@ -63,5 +64,9 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
 
     public function followings(){
         return $this->belongsToMany(Profile::class, "user_follows", "follower_id", "following_id");
+    }
+
+    public function followedCount(){
+        return DB::table("user_follows")->where("following_id" ,"=",$this->id)->count();
     }
 }

@@ -31,12 +31,12 @@
                 <!-- Edit profile button place here-->
                 <EditProfileForm
                     v-if="!this.loading && this.owned"
-                    :username="this.username"
+                    :username="this.profile.user.username"
                 ></EditProfileForm>
             </div>
             <div class="grid grid-cols-2">
                 <ProfileInfo
-                    :username="this.username"
+                    :username="this.profile.user.username"
                     :rolename="this.rolename.join(',')"
                     :followingcount="this.followingcount"
                     :followedcount="this.followedcount"
@@ -77,10 +77,6 @@ export default {
             type: Boolean,
             default: false,
         },
-        username: {
-            type: String,
-            default: "",
-        },
         roles: {
             type: Array,
             default: [],
@@ -103,15 +99,15 @@ export default {
         ProfileNav,
     },
     methods: {
-        ...mapActions(["getProfileAction"]),
-        ...mapMutations(["profileMutate", "setFollowState"]),
+        ...mapActions(["getProfileAction", "isFollowed"]),
+        ...mapMutations(["setProfile"]),
     },
     computed: {
         ...mapGetters(["profile"]),
     },
     async beforeMount() {
         this.loading = true;
-        this.profileMutate(this.user_profile);
+        this.setProfile(this.user_profile);
         this.roles.forEach((role) => {
             switch (role.name) {
                 case "student":
@@ -124,15 +120,9 @@ export default {
                     break;
             }
         });
+        // xem profile của người khác
         if (!this.owned) {
-            try {
-                const response = await axios.post("/profile/followed", {
-                    following_id: this.profile.id,
-                });
-                this.setFollowState(response.data.followed); // true, false
-            } catch (error) {
-                console.log(error);
-            }
+            await this.isFollowed({ profile_id: this.profile.id });
         }
     },
     mounted() {

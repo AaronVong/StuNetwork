@@ -34,7 +34,7 @@ class ToastController extends Controller
     }
 
     public function getToastById($id){
-        $toast = Toast::with(["user:id,username","user.profile:user_id,fullname,avatarUrl", "files", "likes"])->where("id", $id)->get();
+        $toast = Toast::with(["user:id,username","user.profile:user_id,id,fullname,avatarUrl", "files", "likes"])->where("id", $id)->get();
         return $toast;
     }
 
@@ -47,22 +47,17 @@ class ToastController extends Controller
     }
 
     public function getToastsUploadedByUserId($id){
-        $toasts = Toast::with(["user:id,username","user.profile:user_id,fullname,avatarUrl", "files", "likes"])->where("user_id", $id)->orderBy("created_at", "desc")->get();
+        $toasts = Toast::with(["user:id,username","user.profile:user_id,id,fullname,avatarUrl", "files", "likes"])->where("user_id", $id)->orderBy("created_at", "desc")->get();
         return $toasts;
     }
 
     public function getToastsLikedByUserId($id){
-        $toasts = Toast::with(["user:id,username","user.profile:user_id,fullname,avatarUrl", "files", "likes"])->whereHas("likes", function ($query) use($id) {return $query->where("user_id", $id);})->orderBy("created_at", "desc")->get();
+        $toasts = Toast::with(["user:id,username","user.profile:user_id,id,fullname,avatarUrl", "files", "likes"])->whereHas("likes", function ($query) use($id) {return $query->where("user_id", $id);})->orderBy("created_at", "desc")->get();
         return $toasts;
     }
 
     public function index(Request $request, $id){
-        # Tìm toast
         $toast = $this->getToastById($id);
-        // $response = Gate::inspect("follow", $toast->user()->first()->profile);
-        // $followed = $request->user()->followings()->where("following_id", "=", $toast->user_id)->first() ? true: false;
-        // $liked = $toast->likedBy($request->user());
-        # Trả về kết quả
         return $toast ? view("client/pages.toast", ["toast" => $toast]) : throw new HttpException(404);
     }
 
@@ -70,7 +65,7 @@ class ToastController extends Controller
         if(!$request->ajax()){
             throw new HttpException(404);
         }
-        $toasts = Toast::with(["user:id,username","user.profile:user_id,fullname,avatarUrl", "files", "likes"])->orderBy("created_at", "desc")->paginate(10)->items();
+        $toasts = Toast::with(["user:id,username","user.profile:user_id,id,fullname,avatarUrl", "files", "likes"])->orderBy("created_at", "desc")->paginate(10)->items();
         return count($toasts) > 0 ? response(["toasts" => $toasts], 200) : response(["message" => "Không còn toast"], 204);
     }
 
@@ -208,7 +203,7 @@ class ToastController extends Controller
             throw new HttpException(404);
         }
         $toasts = $this->getToastsUploadedByUserId($request->user_id);
-        return $toasts ? response(["toasts" => $toasts], 200):response(["message" => "Không tìm thấy người dùng!", "toasts"=>[]], 404);
+        return $toasts ? response(["toasts" => $toasts, "followings" => $request->user()->followings], 200):response(["message" => "Không tìm thấy người dùng!", "toasts"=>[]], 404);
     }
 
     public function toastsLikedById(Request $request){
@@ -216,6 +211,6 @@ class ToastController extends Controller
             throw new HttpException(404);
         }
         $toasts = $this->getToastsLikedByUserId($request->user_id);
-        return $toasts ? response(["toasts" => $toasts], 200):response(["message" => "Không tìm thấy người dùng!", "toasts"=>[]], 404);
+        return $toasts ? response(["toasts" => $toasts, "followings" => $request->user()->followings], 200):response(["message" => "Không tìm thấy người dùng!", "toasts"=>[]], 404);
     }
 }

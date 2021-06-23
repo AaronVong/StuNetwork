@@ -99,6 +99,7 @@ export default {
                     user_id: id,
                 });
                 commit("setToastList", response.data.toasts);
+                commit("setFollowingsList", response.data.followings);
             } catch (error) {
                 commit("toastActionFail", error.response);
             }
@@ -110,6 +111,7 @@ export default {
                     user_id: id,
                 });
                 commit("setToastList", response.data.toasts);
+                commit("setFollowingsList", response.data.followings);
             } catch (error) {
                 commit("toastActionFail", error.response);
             }

@@ -121,7 +121,7 @@ export default {
         profileID: Number,
     },
     computed: {
-        ...mapGetters(["toastInfoMessage", "toastErrorMessage"]),
+        ...mapGetters(["toastInfoMessage", "toastErrorMessage", "followings"]),
     },
     methods: {
         ...mapActions(["deleteToastAction", "toggleFollow"]),
@@ -165,8 +165,13 @@ export default {
             this.followable = !this.followable;
         },
     },
-    updated() {
+    mounted() {
         this.followable = this.followed;
+    },
+    watch: {
+        followed: function (newVal, oldVal) {
+            this.followable = newVal;
+        },
     },
     components: { ToastForm },
 };

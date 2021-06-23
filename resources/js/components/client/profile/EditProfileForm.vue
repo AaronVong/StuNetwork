@@ -30,8 +30,11 @@
         "
     >
         <h3 class="text-center text-2xl py-2">Cập nhật Profile</h3>
-        <p class="text-center text-red-500 mb-3" v-if="this.profileMessage">
-            {{ this.profileMessage }}
+        <p
+            class="text-center text-red-500 mb-3"
+            v-if="this.profileErrorMessage"
+        >
+            {{ this.profileErrorMessage }}
         </p>
         <form method="post" @submit="this.handleSubmit">
             <div class="flex flex-col justify-center mb-3">
@@ -330,6 +333,9 @@ export default {
             });
             if (ok) {
                 this.toggleEditProfile();
+                this.$message.success({
+                    message: this.profileInfoMessage,
+                });
             }
             loading.close();
         },
@@ -359,7 +365,12 @@ export default {
         },
     },
     computed: {
-        ...mapGetters(["profile", "profileValidates", "profileMessage"]),
+        ...mapGetters([
+            "profile",
+            "profileValidates",
+            "profileErrorMessage",
+            "profileInfoMessage",
+        ]),
     },
     mounted() {
         this.form = { ...this.profile };

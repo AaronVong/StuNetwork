@@ -54,8 +54,10 @@ export default {
         const getFollowings = async () => {
             // dành cho việc quick follow trong toast tools
             await this.getProfilesFollowedByUserId(this.owner);
+            console.log("runned");
         };
         if (this.toast_list) {
+            // khi vào trang home
             this.setToastList(this.toast_list);
             getFollowings();
         }

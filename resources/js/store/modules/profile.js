@@ -3,13 +3,15 @@ const toast = {
     state() {
         return {
             validates: {},
-            message: "",
             profile: {},
             followed: false,
             followings: [],
+            errorMessage: "",
+            infoMessage: "",
         };
     },
     actions: {
+        // Cập nhật profile
         async editProfileAction({ commit }, { formData, username }) {
             try {
                 const response = await axios.post(
@@ -22,25 +24,26 @@ const toast = {
                     }
                 );
                 if (response.status == 200) {
-                    commit("editProfileSuccess", response.data.profile);
+                    commit("editProfileSuccess", response.data);
                 }
                 return true;
             } catch (error) {
-                commit("editProfileFail", error.response);
+                commit("profileActionFail", error.response);
             }
             return false;
         },
-        async toggleFollow({ commit }, following_id) {
+        // toggle follow profile
+        async toggleFollow({ commit }, profile_id) {
             try {
                 const response = await axios.post("/profile/follow", {
-                    following_id,
+                    profile_id,
                 });
                 commit("setFollowState", response.data.followed);
             } catch (error) {
-                console.log(error.response);
-                // commit("handleError", error.response);
+                commit("profileActionFail", error.response);
             }
         },
+        // Lấy danh sách pprofile đã được follow bởi user
         async getProfilesFollowedByUserId({ commit }, id) {
             try {
                 const response = await axios.post("/proifle/followings", {
@@ -48,7 +51,18 @@ const toast = {
                 });
                 commit("setFollowingsList", response.data.followings);
             } catch (error) {
-                console.log(error);
+                commit("profileActionFail", error.response);
+            }
+        },
+        // kiểm tra đã follow profile hay chưa
+        async isFollowed({ commit }, profile_id) {
+            try {
+                const response = await axios.post("/profile/followed", {
+                    profile_id,
+                });
+                commit("setFollowState", response.data.followed);
+            } catch (error) {
+                commit("profileActionFail", error.response);
             }
         },
     },
@@ -59,18 +73,18 @@ const toast = {
         setFollowState(state, payload) {
             state.followed = payload;
         },
-        handleError(state, payload) {},
-        profileMutate(state, payload) {
+        setProfile(state, payload) {
             state.profile = { ...payload };
         },
         editProfileSuccess(state, payload) {
-            state.profile = { ...payload };
+            state.profile = { ...payload.profile };
+            state.infoMessage = payload.message;
         },
-        editProfileFail(state, payload) {
+        profileActionFail(state, payload) {
             if (payload.status == 422) {
-                state.validates = { ...payload.data.validates };
+                state.validates = payload.data.validates;
             } else {
-                state.message = payload.data.message;
+                state.errorMessage = payload.data.message;
             }
         },
     },
@@ -89,6 +103,12 @@ const toast = {
         },
         followings(state) {
             return state.followings;
+        },
+        profileErrorMessage(state) {
+            return state.errorMessage;
+        },
+        profileInfoMessage(state) {
+            return state.infoMessage;
         },
     },
 };

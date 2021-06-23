@@ -47,9 +47,10 @@ class ProfileController extends Controller
     }
 
     function index($username){
-        $user = User::with("profile")->where("username", $username)->first();
+        $user = User::with(["profile"])->where("username", $username)->first();
         if($user!=null){
-            return view("client/pages.profile", ["user"=>$user]);
+            $profile = $user->profile()->with(["user:id,username"])->first();
+            return view("client/pages.profile", ["profile"=>$profile]);
         }
         throw new HttpException(404, "Không tìm thấy profile này!");
     }
@@ -67,11 +68,12 @@ class ProfileController extends Controller
             return response(["message" => "Không hộ trợ phương thúc"], 400);
         }
         # Tìm profile
-        $profile = User::where("username", $username)->first()->profile;
+        $user = User::where("username", $username)->first();
         # Profile không tồn tại ?
-        if(!$profile){ 
-            return response(["message" => "Người dùng này chưa có profile"],404);
+        if(!$user){ 
+            return response(["message" => "Không tìm thấy profile của người dùng"],404);
         }else{
+            $profile = $user->profile()->with(["user:id,username"])->first();
             $response = Gate::inspect("update", $profile);  
             # Kiểm tra quyền cập nhật      
             if($response->allowed()){
@@ -104,7 +106,7 @@ class ProfileController extends Controller
                         $profile->backgroundUrl = $result["url"];
                     }
                     $profile->save();
-                    return response(["profile" => $profile], 200);
+                    return response(["profile" => $profile, "message" => "Cập nhật profile thành công"], 200);
                 }catch(\Exception $e){
                     return response(["message" => $e->getMessage()], 404);
                 }
@@ -115,17 +117,17 @@ class ProfileController extends Controller
     }
 
     public function follow(Request $request){
-        $profile = Profile::find($request->following_id);
+        $profile = Profile::find($request->profile_id);
         if($profile){
             $response = Gate::inspect("follow", $profile);
             if($response->allowed()){
-                $isFollowed = $request->user()->followings()->where("following_id", $request->following_id)->first() == null ? false : true;
+                $isFollowed = $request->user()->followings()->where("following_id", $request->profile_id)->first() == null ? false : true;
                 if($isFollowed){
-                    $request->user()->followings()->detach($request->following_id);
+                    $request->user()->followings()->detach($request->profile_id);
                     $isFollowed = false;
                 }
                 else{
-                    $request->user()->followings()->attach($request->following_id);
+                    $request->user()->followings()->attach($request->profile_id);
                     $isFollowed = true;
                 }
                 return response(["followed" => $isFollowed],200);
@@ -136,12 +138,14 @@ class ProfileController extends Controller
         return response(["message" => "Profile không tồn tại"], 404);
     }
 
+    # kiểm tra đã follow profile này chưa
     public function followed(Request $request){
-        $profile = Profile::find($request->following_id);
-        if($profile){
+        $user = User::find($request->profile_id)->first();
+        if($user){
+            $profile = $user->profile;
             $response = Gate::inspect("follow", $profile);
             if($response->allow()){
-                $isFollowed = $request->user()->followings()->where("following_id", $request->following_id)->first() == null ? false : true;
+                $isFollowed = $request->user()->followings()->where("following_id", $request->profile_id)->first() == null ? false : true;
                 return response(["followed" =>  $isFollowed], 200);
             }
             return response(["message" => $response->message()], 403);

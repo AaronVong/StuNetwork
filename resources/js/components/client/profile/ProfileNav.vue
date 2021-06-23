@@ -35,7 +35,7 @@ export default {
     },
     props: {
         user_id: Number, // profile owner
-        visitor: Number,
+        visitor: Number, // guest
         owned: Boolean,
     },
     computed: {
@@ -54,11 +54,9 @@ export default {
             switch (tab.props.name) {
                 case "toasted":
                     await this.getToastListUploadedByUserId(this.user_id);
-
                     break;
                 case "liked":
                     await this.getToastListLikedByUserId(this.user_id);
-
                     break;
                 case "followings":
                     await this.getProfilesFollowedByUserId(this.user_id);

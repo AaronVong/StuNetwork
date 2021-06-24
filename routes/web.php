@@ -5,6 +5,7 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\VerificationController;
 use App\Http\Controllers\Client\HomeController;
 use App\Http\Controllers\Client\ProfileController;
+use App\Http\Controllers\Client\ToastCommentController;
 use App\Http\Controllers\Client\ToastController;
 use App\Http\Controllers\Client\UserController;
 use Illuminate\Support\Facades\App;
@@ -68,6 +69,9 @@ Route::middleware(["verified", "auth"])->group(function(){
     Route::post("/toast/uploaded", [ToastController::class, "toastsUploadedById"]);
     Route::post("/toast/liked", [ToastController::class, "toastsLikedById"]);
     Route::post("/toast/followed", [UserController::class, "profilesFollowedById"]);
+
+    Route::post("/toast/{id}/comment", [ToastCommentController::class, "store"]);
+    Route::post("/comment/{id}/reply", [ToastCommentController::class, "reply"]);
 });
 
 

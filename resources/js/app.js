@@ -38,6 +38,7 @@ import QuickToast from "./components/client/toast/QuickToast";
 import ToastList from "./components/client/toast/ToastList";
 import Profile from "./components/client/profile/Profile";
 import Toast from "./components/client/toast/Toast";
+import Comments from "./components/client/comment/Comments";
 const app = createApp({
     components: {
         "register-form": RegisterForm,
@@ -50,6 +51,7 @@ const app = createApp({
         "toast-list": ToastList,
         toast: Toast,
         profile: Profile,
+        "toast-comments": Comments,
     },
 });
 

@@ -58,7 +58,10 @@ class ToastController extends Controller
 
     public function index(Request $request, $id){
         $toast = $this->getToastById($id);
-        return $toast ? view("client/pages.toast", ["toast" => $toast]) : throw new HttpException(404);
+        $replies = $toast->first()->toastComments()->whereNotNull("child_id")->get();
+        $comments = $toast->first()->toastComments()->whereNull("child_id")->get();
+ 
+        return $toast ? view("client/pages.toast", ["toast" => $toast, "comments"=>$comments, "replies" => $replies]) : throw new HttpException(404);
     }
 
     public function paginate(Request $request){

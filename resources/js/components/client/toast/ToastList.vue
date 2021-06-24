@@ -1,5 +1,5 @@
 <template>
-    <div class="infinite-list-wrapper" style="overflow: auto">
+    <div class="infinite-list-wrapper border-b" style="overflow: auto">
         <ul
             v-infinite-scroll="this.load"
             infinite-scroll-disabled="disabled"
@@ -54,7 +54,6 @@ export default {
         const getFollowings = async () => {
             // dành cho việc quick follow trong toast tools
             await this.getProfilesFollowedByUserId(this.owner);
-            console.log("runned");
         };
         if (this.toast_list) {
             // khi vào trang home

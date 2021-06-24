@@ -8,11 +8,12 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\CanResetPassword;
 use Illuminate\Support\Facades\DB;
+use Laravelista\Comments\Commenter;
 use Overtrue\LaravelLike\Traits\Liker;
 
 class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
 {
-    use HasFactory, Notifiable, Liker;
+    use HasFactory, Notifiable, Liker, Commenter;
     /**
      * The attributes that are mass assignable.
      *

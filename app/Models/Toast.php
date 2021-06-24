@@ -4,11 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Config;
+use Laravelista\Comments\Commentable;
 use Overtrue\LaravelLike\Traits\Likeable;
 
 class Toast extends Model
 {
-    use HasFactory, Likeable;
+    use HasFactory, Likeable, Commentable;
     protected $fillable=[
         "content"
     ];
@@ -26,5 +28,9 @@ class Toast extends Model
 
     public function likedBy(User $user){
         return $this->likes->contains("user_id", $user->id);
+    }
+
+    public function toastComments(){
+        return $this->morphMany(Config::get("comments.model"), "comments","commentable_type","commentable_id","id");
     }
 }

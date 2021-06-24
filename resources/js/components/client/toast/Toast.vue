@@ -1,5 +1,5 @@
 <template>
-    <div class="toast p-3 hover:bg-gray-50 transition-colors list-item">
+    <div class="toast p-3 hover:bg-gray-50 transition-colors list-item z-10">
         <div class="toast__head w-full flex mb-3">
             <div class="flex-grow-0 flex-shrink-0 max-w-xs mr-2">
                 <img
@@ -93,23 +93,33 @@
                     </button>
                     {{ this.toast.likes.length }}
                 </div>
-                <div class="mr-3 flex mr-6 pill">
-                    <!-- Comment button place here -->
-                    <a
+                <div class="flex pill">
+                    <!-- Comment Form trigger place here -->
+                    <button
                         class="
                             modal__btn
                             focus:outline-none
                             text-indigo-600
                             pill-hover pill-hover--cycle
                         "
-                        href="#"
+                        @click="
+                            () => {
+                                this.showComment = !this.showComment;
+                            }
+                        "
+                        type="button"
                     >
-                        <button>
-                            <i class="fas fa-comment" type="button"></i>
-                        </button>
-                    </a>
+                        <i class="fas fa-comment"></i>
+                    </button>
                 </div>
             </div>
+        </div>
+        <div>
+            <CommentForm
+                :toast_id="this.toast.id"
+                :visible="this.showComment"
+                :isComment="true"
+            />
         </div>
     </div>
 </template>
@@ -117,6 +127,7 @@
 <script>
 import ToastFile from "./ToastFile.vue";
 import ToastTools from "./ToastTools.vue";
+import CommentForm from "../comment/CommentForm.vue";
 import { format, register } from "timeago.js";
 import { mapActions } from "vuex";
 export default {
@@ -124,6 +135,7 @@ export default {
     data() {
         return {
             diffForHumans: "",
+            showComment: false,
         };
     },
     methods: {
@@ -139,7 +151,7 @@ export default {
         liked: Boolean,
         followed: Boolean,
     },
-    components: { ToastFile, ToastTools },
+    components: { ToastFile, ToastTools, CommentForm },
     mounted() {
         const date = new Date(this.toast.created_at);
         const localeFnc = function (number, index, totalSec) {

@@ -72,6 +72,8 @@ Route::middleware(["verified", "auth"])->group(function(){
 
     Route::post("/toast/{id}/comment", [ToastCommentController::class, "store"]);
     Route::post("/comment/{id}/reply", [ToastCommentController::class, "reply"]);
+    Route::put("/comment/{id}",[ToastCommentController::class, "update"]);
+    Route::delete("/comment/{id}",[ToastCommentController::class, "destroy"]);
 });
 
 

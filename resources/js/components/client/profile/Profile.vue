@@ -11,21 +11,25 @@
                         avatar
                         rounded-full
                         w-24
-                        md:w-32
-                        md:h-32
-                        md:absolute
-                        md:left-6
+                        md:w-32 md:h-32 md:absolute md:left-6
                     "
                 >
                     <img
                         v-if="this.profile.avatarUrl"
                         :src="this.profile.avatarUrl"
-                        class="block md:w-full md:h-full rounded-full h-16 w-16"
+                        class="
+                            block
+                            md:w-full md:h-full
+                            rounded-full
+                            h-16
+                            w-16
+                            border border-gray-500
+                        "
                     />
                     <img
                         v-else
                         src="http://via.placeholder.com/50"
-                        class="w-full rounded-full"
+                        class="w-full rounded-full border border-gray-500"
                     />
                 </div>
                 <!-- Edit profile button place here-->

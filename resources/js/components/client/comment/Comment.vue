@@ -1,57 +1,82 @@
 <template>
-    <div class="ml-3 comment px-2 border-l border-black">
-        <div class="w-full flex mb-3">
-            <div class="flex-grow-0 flex-shrink-0 max-w-xs mr-2">
-                <img
-                    v-if="comment.commenter.profile.avatarUrl"
-                    :src="comment.commenter.profile.avatarUrl"
-                    class="block md:w-16 md:h-16 rounded-full h-12 w-12"
-                />
-                <img
-                    v-else
-                    src="https://via.placeholder.com/50"
-                    class="block md:w-16 md:h-16 rounded-full h-12 w-12"
-                />
+    <div class="ml-3 comment border-l-4 border-gray-300 mb-3">
+        <div class="hover:bg-gray-100 p-3">
+            <div class="w-full flex mb-3">
+                <div class="flex-grow-0 flex-shrink-0 max-w-xs mr-2">
+                    <img
+                        v-if="comment.commenter.profile.avatarUrl"
+                        :src="comment.commenter.profile.avatarUrl"
+                        class="
+                            block
+                            md:w-16 md:h-16
+                            rounded-full
+                            border border-gray-500
+                            h-12
+                            w-12
+                        "
+                    />
+                    <img
+                        v-else
+                        src="https://via.placeholder.com/50"
+                        class="
+                            block
+                            md:w-16 md:h-16
+                            rounded-full
+                            h-12
+                            w-12
+                            border
+                        "
+                    />
+                </div>
+                <div class="flex flex-col">
+                    <a
+                        v-bind:href="`/profile/${comment.commenter.username}`"
+                        class="hover:underline"
+                    >
+                        <span class="font-medium">{{
+                            comment.commenter.profile.fullname
+                        }}</span>
+                    </a>
+                    <span class="font-normal text-gray-500 emphasis"
+                        ><i>{{ comment.commenter.username }}</i></span
+                    >
+                </div>
+                <!-- Tools -->
+
+                <div class="ml-auto">
+                    <CommentTools
+                        :comment="this.comment"
+                        :processable="this.owned"
+                    />
+                </div>
             </div>
-            <div class="flex flex-col">
-                <a
-                    v-bind:href="`/profile/${comment.commenter.username}`"
-                    class="hover:underline"
-                >
-                    <span class="font-medium">{{
-                        comment.commenter.profile.fullname
-                    }}</span>
-                </a>
-                <span class="font-normal text-gray-500 emphasis"
-                    ><i>{{ comment.commenter.username }}</i></span
-                >
+            <!-- Comment Content -->
+            <div>
+                <p class="p-3">
+                    {{ comment.comment }}
+                </p>
             </div>
+            <div>
+                <button
+                    class="
+                        modal__btn
+                        focus:outline-none
+                        text-indigo-600
+                        pill-hover pill-hover--cycle
+                    "
+                    @click="this.toggleCommentForm"
+                    type="button"
+                >
+                    <i class="fas fa-comment"></i>
+                </button>
+            </div>
+            <CommentForm
+                :visible="this.commentFormVisible"
+                :parentId="this.comment.id"
+                :toast_id="parseInt(this.comment.commentable_id)"
+                v-on:closeCommentForm="this.toggleCommentForm"
+            />
         </div>
-        <div>
-            <p class="p-3">
-                {{ comment.comment }}
-            </p>
-        </div>
-        <div>
-            <button
-                class="
-                    modal__btn
-                    focus:outline-none
-                    text-indigo-600
-                    pill-hover pill-hover--cycle
-                "
-                @click="this.toggleVisible"
-                type="button"
-            >
-                <i class="fas fa-comment"></i>
-            </button>
-        </div>
-        <CommentForm
-            :visible="this.visible"
-            :parentId="this.comment.id"
-            :toast_id="parseInt(this.comment.commentable_id)"
-            v-on:closeCommentForm="this.toggleVisible"
-        />
         <div>
             <!-- Replies -->
             <Comment
@@ -60,6 +85,8 @@
                 )"
                 :key="index"
                 :comment="reply"
+                :owner="this.owner"
+                :owned="this.owner ? this.owner == reply.commenter_id : false"
             />
         </div>
     </div>
@@ -67,12 +94,13 @@
 
 <script>
 import CommentForm from "./CommentForm.vue";
-import { mapGetters } from "vuex";
+import { mapGetters, mapActions } from "vuex";
+import CommentTools from "./CommentTools.vue";
 export default {
     name: "Comment",
     data() {
         return {
-            visible: false,
+            commentFormVisible: false,
         };
     },
     computed: {
@@ -84,12 +112,20 @@ export default {
             type: Boolean,
             default: true,
         },
-    },
-    methods: {
-        toggleVisible() {
-            this.visible = !this.visible;
+        owned: {
+            type: Boolean,
+            default: false,
+        },
+        owner: {
+            type: Number,
+            default: null,
         },
     },
-    components: { CommentForm },
+    methods: {
+        toggleCommentForm() {
+            this.commentFormVisible = !this.commentFormVisible;
+        },
+    },
+    components: { CommentForm, CommentTools },
 };
 </script>

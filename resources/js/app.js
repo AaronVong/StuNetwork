@@ -70,3 +70,5 @@ app.use(ElTabs);
 app.use(ElInfiniteScroll);
 app.use(store);
 app.mount("#app");
+
+/* App Script */

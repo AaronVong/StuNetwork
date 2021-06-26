@@ -1,5 +1,10 @@
 <template>
-    <div class="w-full mb-3" v-if="this.visible">
+    <div
+        class="w-full mb-3"
+        v-if="this.visible"
+        v-loading="this.loading"
+        element-loading-text="Đang xử lý, vui lòng chờ..."
+    >
         <form method="POST" @submit.prevent="this.handleCommentSubmit">
             <div>
                 <textarea
@@ -11,6 +16,7 @@
                         bg-transparent
                         text-lg text-black
                         p-3
+                        border
                     "
                     placeholder="Viết bình luận..."
                     rows="3"
@@ -51,6 +57,7 @@ export default {
     data() {
         return {
             content: "",
+            loading: false,
         };
     },
     methods: {
@@ -59,10 +66,7 @@ export default {
             this.visible = !this.visible;
         },
         async handleCommentSubmit() {
-            const loading = this.$loading({
-                fullscreen: true,
-                text: "Đang xử lý, vui lòng chờ...",
-            });
+            this.loading = true;
             let ok = false;
             if (this.isComment) {
                 ok = await this.commentAction({
@@ -85,7 +89,7 @@ export default {
                     });
                 }
             }
-            loading.close();
+            this.loading = false;
         },
     },
     computed: {

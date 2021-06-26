@@ -5,12 +5,26 @@
                 <img
                     v-if="toast.user.profile.avatarUrl"
                     :src="toast.user.profile.avatarUrl"
-                    class="block md:w-16 md:h-16 rounded-full h-12 w-12"
+                    class="
+                        block
+                        md:w-16 md:h-16
+                        rounded-full
+                        h-12
+                        w-12
+                        border border-gray-500
+                    "
                 />
                 <img
                     v-else
                     src="https://via.placeholder.com/50"
-                    class="block md:w-16 md:h-16 rounded-full h-12 w-12"
+                    class="
+                        block
+                        md:w-16 md:h-16
+                        rounded-full
+                        h-12
+                        w-12
+                        border border-gray-500
+                    "
                 />
             </div>
             <div class="flex flex-col">
@@ -111,6 +125,7 @@
                     >
                         <i class="fas fa-comment"></i>
                     </button>
+                    {{ this.toast.toast_comments_count }}
                 </div>
             </div>
         </div>
@@ -129,7 +144,7 @@ import ToastFile from "./ToastFile.vue";
 import ToastTools from "./ToastTools.vue";
 import CommentForm from "../comment/CommentForm.vue";
 import { format, register } from "timeago.js";
-import { mapActions } from "vuex";
+import { mapActions, mapGetters } from "vuex";
 export default {
     name: "Toast",
     data() {
@@ -150,6 +165,9 @@ export default {
         owned: Boolean,
         liked: Boolean,
         followed: Boolean,
+    },
+    computed: {
+        ...mapGetters([]),
     },
     components: { ToastFile, ToastTools, CommentForm },
     mounted() {

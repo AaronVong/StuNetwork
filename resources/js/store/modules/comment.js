@@ -45,6 +45,39 @@ export default {
             }
             return false;
         },
+
+        async deleteCommentAction({ commit }, comment_id) {
+            try {
+                const response = await axios.delete(`/comment/${comment_id}`);
+                commit("deleteCommentSuccess", response.data);
+                return true;
+            } catch (error) {
+                commit("commentActionFail", error.response);
+            }
+            return false;
+        },
+
+        async updateCommentAction({ commit }, { content, comment_id }) {
+            try {
+                const response = await axios.post(
+                    `/comment/${comment_id}`,
+                    {
+                        comment: content,
+                        _method: "PUT",
+                    },
+                    {
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                    }
+                );
+                commit("updateCommentSuccess", response.data);
+                return response.status;
+            } catch (error) {
+                commit("commentActionFail", error.response);
+                return error.response.status;
+            }
+        },
     },
     mutations: {
         commentActionFail(state, payload) {
@@ -66,6 +99,42 @@ export default {
         },
         setReplyList(state, payload) {
             state.replyList = [...payload];
+        },
+        deleteCommentSuccess(state, payload) {
+            if (payload.comment.child_id == null) {
+                const index = state.commentList.findIndex(
+                    (comment) => comment.id == payload.comment.id
+                );
+                if (index > -1) {
+                    state.commentList.splice(index, 1);
+                }
+            } else {
+                const index = state.replyList.findIndex(
+                    (comment) => comment.id == payload.comment.id
+                );
+                if (index > -1) {
+                    state.replyList.splice(index, 1);
+                }
+            }
+            state.infoMessgae = payload.message;
+        },
+        updateCommentSuccess(state, payload) {
+            if (payload.comment.child_id == null) {
+                const index = state.commentList.findIndex(
+                    (comment) => comment.id == payload.comment.id
+                );
+                if (index > -1) {
+                    state.commentList[index].comment = payload.comment.comment;
+                }
+            } else {
+                const index = state.replyList.findIndex(
+                    (comment) => comment.id == payload.comment.id
+                );
+                if (index > -1) {
+                    state.replyList[index].comment = payload.comment.comment;
+                }
+            }
+            state.infoMessgae = payload.message;
         },
     },
     getters: {

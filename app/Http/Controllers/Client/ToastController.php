@@ -34,7 +34,7 @@ class ToastController extends Controller
     }
 
     public function getToastById($id){
-        $toast = Toast::with(["user:id,username","user.profile:user_id,id,fullname,avatarUrl", "files", "likes"])->where("id", $id)->get();
+        $toast = Toast::with(["user:id,username","user.profile:user_id,id,fullname,avatarUrl", "files", "likes"])->withCount("toastComments")->where("id", $id)->get();
         return $toast;
     }
 
@@ -58,17 +58,20 @@ class ToastController extends Controller
 
     public function index(Request $request, $id){
         $toast = $this->getToastById($id);
+        if($toast->count() <= 0){
+            return throw new HttpException(404);
+        }
         $replies = $toast->first()->toastComments()->whereNotNull("child_id")->get();
         $comments = $toast->first()->toastComments()->whereNull("child_id")->get();
  
-        return $toast ? view("client/pages.toast", ["toast" => $toast, "comments"=>$comments, "replies" => $replies]) : throw new HttpException(404);
+        return view("client/pages.toast", ["toast" => $toast, "comments"=>$comments, "replies" => $replies]) ;
     }
 
     public function paginate(Request $request){
         if(!$request->ajax()){
             throw new HttpException(404);
         }
-        $toasts = Toast::with(["user:id,username","user.profile:user_id,id,fullname,avatarUrl", "files", "likes"])->orderBy("created_at", "desc")->paginate(10)->items();
+        $toasts = Toast::with(["user:id,username","user.profile:user_id,id,fullname,avatarUrl", "files", "likes",])->withCount("toastComments")->orderBy("created_at", "desc")->paginate(10)->items();
         return count($toasts) > 0 ? response(["toasts" => $toasts], 200) : response(["message" => "Không còn toast"], 204);
     }
 

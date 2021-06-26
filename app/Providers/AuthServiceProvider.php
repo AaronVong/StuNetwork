@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Policies\CommentPolicy;
 use App\Policies\ProfilePolicy;
 use App\Policies\ToastPolicy;
 use App\Policies\UserPolicy;
@@ -9,6 +10,7 @@ use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Support\Facades\Gate;
+use Laravelista\Comments\Comment;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -22,6 +24,7 @@ class AuthServiceProvider extends ServiceProvider
         Toast::class => ToastPolicy::class,
         User::class => UserPolicy::class,
         Profile::class => ProfilePolicy::class,
+        Comment::class => CommentPolicy::class,
     ];
 
     /**

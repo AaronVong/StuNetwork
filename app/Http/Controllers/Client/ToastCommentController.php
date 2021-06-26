@@ -8,6 +8,7 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Validator;
 
 class ToastCommentController extends Controller
@@ -73,10 +74,51 @@ class ToastCommentController extends Controller
         }
         return response(["message" => "Không tìm thấy comment"], 404);
     }
-    public function update(Request $request){
+    public function update(Request $request, $id){
+        $commentClass = Config::get("comments.model");
+        $comment = $commentClass::find($id);
+        if($comment == null){
+            return response(["message" => "Comment đã bị xóa hoặc không tồn tại"], 404);
+        }
 
+        $response = Gate::inspect("update", $comment);
+        if($response->denied()){            
+            return response(["message" => $response->message()], $response->code());
+        }
+        
+        try{
+            $validator =  Validator::make($request->all(), $this->rules, $this->messages);
+            if($validator->fails()){
+                return response(["validates"=>$validator->errors()], 422);
+            }
+            $comment->update([
+                'comment' => $request->comment
+            ]);
+            return response(["message" => "Comment đã được cập nhật", "comment" => $commentClass::find($id)], 200);
+        }catch(Exception $error){
+            return response(["message" => $error->getMessage()], 500);
+        }
     }
-    public function destroy(Request $request){
-
+    public function destroy(Request $request, $id){
+        $commentClass = Config::get("comments.model");
+        $comment = $commentClass::find($id);
+        if($comment == null){
+            return response(["message" => "Comment đã bị xóa hoặc không tồn tại"], 404);
+        }
+        $response = Gate::inspect("delete", $comment);
+        if($response->denied()){
+            return response(["message" => $response->message()], $response->code());
+        }
+        try{
+            if (Config::get('comments.soft_deletes') == true) {
+                $comment->delete();
+            }
+            else {
+                $comment->forceDelete();
+		    }
+            return response(["message"=> "Comment đã được xóa", "comment" => $comment], 200);
+        }catch(Exception $error){
+            return response(["message" => $error->getMessage()], 500);
+        }
     }
 }

@@ -4,6 +4,8 @@
             v-for="(comment, index) in this.commentList"
             :comment="comment"
             :key="index"
+            :owned="this.owner ? this.owner == comment.commenter_id : false"
+            :owner="this.owner"
         />
     </ul>
 </template>
@@ -17,6 +19,10 @@ export default {
         comments: Array,
         replies: {
             type: Array,
+            default: null,
+        },
+        owner: {
+            type: Number,
             default: null,
         },
     },

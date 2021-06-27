@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Client;
 use App\Http\Controllers\Controller;
 use App\Models\Toast;
 use Exception;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
@@ -34,7 +35,14 @@ class ToastController extends Controller
     }
 
     public function getToastById($id){
-        $toast = Toast::with(["user:id,username","user.profile:user_id,id,fullname,avatarUrl", "files", "likes"])->withCount("toastComments")->where("id", $id)->get();
+        // $toast = Toast::with(["user:id,username","user.profile:user_id,id,fullname,avatarUrl", "files", "likes"])->withCount("toastComments")->where("id", $id)->get();
+        $toast = Toast::with(["user:id,username","ownerProfile:user_id,id,fullname,avatarUrl", "files"])->withCount(["likes as liked" => function (Builder $query){
+            $query->where("user_id", auth()->user()->id);
+        }, "toastComments as commentsCount", "ownerProfile as followed" => function(Builder $query){
+            $query->whereHas("followers", function($follower){
+                $follower->where("follower_id", auth()->user()->id);
+            });
+        },"likes as likesCount"])->where("id", $id)->get();
         return $toast;
     }
 
@@ -47,12 +55,24 @@ class ToastController extends Controller
     }
 
     public function getToastsUploadedByUserId($id){
-        $toasts = Toast::with(["user:id,username","user.profile:user_id,id,fullname,avatarUrl", "files", "likes"])->where("user_id", $id)->orderBy("created_at", "desc")->get();
+        $toasts = Toast::with(["user:id,username","ownerProfile:user_id,id,fullname,avatarUrl", "files"])->withCount(["likes as liked" => function (Builder $query){
+            $query->where("user_id", auth()->user()->id);
+        }, "toastComments as commentsCount", "ownerProfile as followed" => function(Builder $query){
+            $query->whereHas("followers", function($follower){
+                $follower->where("follower_id", auth()->user()->id);
+            });
+        },"likes as likesCount"])->where("user_id", $id)->orderBy("created_at", "desc")->get();
         return $toasts;
     }
 
     public function getToastsLikedByUserId($id){
-        $toasts = Toast::with(["user:id,username","user.profile:user_id,id,fullname,avatarUrl", "files", "likes"])->whereHas("likes", function ($query) use($id) {return $query->where("user_id", $id);})->orderBy("created_at", "desc")->get();
+        $toasts = Toast::with(["user:id,username","ownerProfile:user_id,id,fullname,avatarUrl", "files"])->withCount(["likes as liked" => function (Builder $query){
+            $query->where("user_id", auth()->user()->id);
+        }, "toastComments as commentsCount", "ownerProfile as followed" => function(Builder $query){
+            $query->whereHas("followers", function($follower){
+                $follower->where("follower_id", auth()->user()->id);
+            });
+        },"likes as likesCount"])->whereHas("likes", function ($query) use($id) {return $query->where("user_id", $id);})->orderBy("created_at", "desc")->get();
         return $toasts;
     }
 
@@ -71,7 +91,13 @@ class ToastController extends Controller
         if(!$request->ajax()){
             throw new HttpException(404);
         }
-        $toasts = Toast::with(["user:id,username","user.profile:user_id,id,fullname,avatarUrl", "files", "likes",])->withCount("toastComments")->orderBy("created_at", "desc")->paginate(10)->items();
+        $toasts = Toast::with(["user:id,username","ownerProfile:user_id,id,fullname,avatarUrl", "files"])->withCount(["likes as liked" => function (Builder $query){
+            $query->where("user_id", auth()->user()->id);
+        }, "toastComments as commentsCount", "ownerProfile as followed" => function(Builder $query){
+            $query->whereHas("followers", function($follower){
+                $follower->where("follower_id", auth()->user()->id);
+            });
+        },"likes as likesCount"])->orderBy("created_at", "desc")->paginate(10)->items();
         return count($toasts) > 0 ? response(["toasts" => $toasts], 200) : response(["message" => "Không còn toast"], 204);
     }
 
@@ -200,8 +226,10 @@ class ToastController extends Controller
         if($toast==null){
             return response(["message" => "Không tìm thấy toast"], 404);
         }
-        $request->user()->toggleLike($toast);
-        return response(["likes" => $toast->likes, "toastID" => $toast->id],200);
+        # return true -> delete like
+        # return Like::class -> insert like
+        $result = $request->user()->toggleLike($toast);
+        return response(["likes" => $toast->likes, "toastID" => $toast->id, "liked" => $result === true ? false : true],200);
     }
 
     public function toastsUploadedById(Request $request){

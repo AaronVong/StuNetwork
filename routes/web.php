@@ -8,6 +8,7 @@ use App\Http\Controllers\Client\ProfileController;
 use App\Http\Controllers\Client\ToastCommentController;
 use App\Http\Controllers\Client\ToastController;
 use App\Http\Controllers\Client\UserController;
+use App\Http\Controllers\Client\MessageController;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Route;
 
@@ -74,6 +75,8 @@ Route::middleware(["verified", "auth"])->group(function(){
     Route::post("/comment/{id}/reply", [ToastCommentController::class, "reply"]);
     Route::put("/comment/{id}",[ToastCommentController::class, "update"]);
     Route::delete("/comment/{id}",[ToastCommentController::class, "destroy"]);
+
+    Route::get("/messages", [MessageController::class, "index"])->name("chat");
 });
 
 

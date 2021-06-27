@@ -3,8 +3,8 @@
         <div class="toast__head w-full flex mb-3">
             <div class="flex-grow-0 flex-shrink-0 max-w-xs mr-2">
                 <img
-                    v-if="toast.user.profile.avatarUrl"
-                    :src="toast.user.profile.avatarUrl"
+                    v-if="toast.owner_profile.avatarUrl"
+                    :src="toast.owner_profile.avatarUrl"
                     class="
                         block
                         md:w-16 md:h-16
@@ -33,7 +33,7 @@
                     class="hover:underline"
                 >
                     <span class="font-medium">{{
-                        toast.user.profile.fullname
+                        toast.owner_profile.fullname
                     }}</span>
                 </a>
                 <span class="font-normal text-gray-500 emphasis"
@@ -50,7 +50,7 @@
                 :owned="this.owned"
                 :toastID="this.toast.id"
                 :followed="this.followed"
-                :profileID="this.toast.user.profile.id"
+                :profileID="this.toast.owner_profile.id"
             />
         </div>
         <div class="toast__body w-full mb-3 px-3 min-h-full">
@@ -82,7 +82,7 @@
                 <!-- Like button here -->
                 <div>
                     <button
-                        v-if="!this.liked"
+                        v-if="!this.likeable"
                         @click="this.handleLike"
                         type="button"
                         class="
@@ -96,7 +96,7 @@
                     <button
                         @click="this.handleLike"
                         type="button"
-                        v-if="this.liked"
+                        v-if="this.likeable"
                         class="
                             pill-hover pill-hover--cycle pill-hover--red
                             focus:outline-none
@@ -105,7 +105,7 @@
                     >
                         <i class="fas fa-heart"></i>
                     </button>
-                    {{ this.toast.likes.length }}
+                    {{ this.toast.likesCount }}
                 </div>
                 <div class="flex pill">
                     <!-- Comment Form trigger place here -->
@@ -125,7 +125,7 @@
                     >
                         <i class="fas fa-comment"></i>
                     </button>
-                    {{ this.toast.toast_comments_count }}
+                    {{ this.toast.commentsCount }}
                 </div>
             </div>
         </div>
@@ -151,13 +151,20 @@ export default {
         return {
             diffForHumans: "",
             showComment: false,
+            likeable: false,
         };
     },
     methods: {
         ...mapActions(["likeToastAction"]),
         async handleLike(e) {
             e.preventDefault();
-            await this.likeToastAction(this.toast.id);
+            this.likeable = await this.likeToastAction(this.toast.id);
+            if (this.likeable == null) {
+                this.$message({
+                    type: "error",
+                    message: this.toastErrorMessage,
+                });
+            }
         },
     },
     props: {
@@ -167,10 +174,11 @@ export default {
         followed: Boolean,
     },
     computed: {
-        ...mapGetters([]),
+        ...mapGetters(["toastErrorMessage"]),
     },
     components: { ToastFile, ToastTools, CommentForm },
     mounted() {
+        this.likeable = this.liked;
         const date = new Date(this.toast.created_at);
         const localeFnc = function (number, index, totalSec) {
             return [

@@ -11,12 +11,8 @@
                 :key="index"
                 :toast="toast"
                 :owned="this.owner === toast.user.id"
-                :liked="toast.likes.some((item) => item.user_id === this.owner)"
-                :followed="
-                    this.followings.some(
-                        (item) => item.user_id == toast.user_id
-                    )
-                "
+                :liked="toast.liked == 1"
+                :followed="toast.followed == 1"
             ></Toast>
         </ul>
         <p v-if="loading">Loading...</p>
@@ -51,14 +47,14 @@ export default {
     },
     components: { Toast },
     mounted() {
-        const getFollowings = async () => {
-            // dành cho việc quick follow trong toast tools
-            await this.getProfilesFollowedByUserId(this.owner);
-        };
+        // const getFollowings = async () => {
+        //     // dành cho việc quick follow trong toast tools
+        //     await this.getProfilesFollowedByUserId(this.owner);
+        // };
         if (this.toast_list) {
             // khi vào trang home
             this.setToastList(this.toast_list);
-            getFollowings();
+            // getFollowings();
         }
     },
 };

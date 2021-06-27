@@ -1,6 +1,6 @@
 <template>
     <el-popover placement="bottom" v-model:visible="this.toolsBoxVisible">
-        <div class="flex flex-col justify-center items-center">
+        <div class="flex flex-col justify-center items-center gap-3">
             <button
                 v-if="this.processable"
                 type="button"
@@ -10,7 +10,7 @@
                     hover:text-red-500
                     cursor-pointer
                 "
-                @click.prevent="this.confirmDeleteComment"
+                @click="this.confirmDeleteComment"
             >
                 <i class="far fa-trash-alt mr-2"></i> Xóa bình luận
             </button>
@@ -69,29 +69,33 @@ export default {
         toggleEditComment() {
             this.editCommentVisible = !this.editCommentVisible;
         },
-        confirmDeleteComment() {
-            this.$confirm(
-                "Comment này sau khi xóa sẽ không khôi phục, bạn vẫn muốn xóa?",
-                "Cảnh báo",
-                {
-                    confirmButtonText: "Đồng ý",
-                    cancelButtonText: "Hủy bỏ",
-                    type: "warning",
-                }
-            ).then(async () => {
+        async confirmDeleteComment() {
+            try {
+                const confirmed = await this.$confirm(
+                    "Comment này sau khi xóa sẽ không khôi phục, bạn vẫn muốn xóa?",
+                    "Cảnh báo",
+                    {
+                        confirmButtonText: "Đồng ý",
+                        cancelButtonText: "Hủy bỏ",
+                        type: "warning",
+                    }
+                );
                 const ok = await this.deleteCommentAction(this.comment.id);
                 if (ok) {
                     this.$message({
                         message: this.commentInfoMessage,
                         type: "success",
                     });
+                    console.trace(this.commentInfoMessage);
                 } else {
                     this.$message({
                         message: this.commentErrorMessage,
                         type: "error",
                     });
                 }
-            });
+            } catch (error) {
+                console.log(error);
+            }
         },
     },
 };

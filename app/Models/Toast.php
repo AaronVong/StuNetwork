@@ -14,8 +14,13 @@ class Toast extends Model
     protected $fillable=[
         "content"
     ];
+
     public function user(){
         return $this->belongsTo(User::class, "user_id", "id");
+    }
+
+    public function ownerProfile(){
+        return $this->hasOne(Profile::class, "user_id", "user_id");
     }
 
     public function files(){

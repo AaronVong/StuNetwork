@@ -88,8 +88,10 @@ export default {
             try {
                 const response = await axios.post("/toast/like", { id });
                 commit("likeToastSuccess", response.data);
+                return response.data.liked;
             } catch (error) {
                 commit("toastActionFail", error.response);
+                return null;
             }
         },
         /* Lấy danh sách Toasts được upload bởi người dùng */
@@ -194,10 +196,14 @@ export default {
         likeToastSuccess(state, payload) {
             state.toastList = state.toastList.map((item) => {
                 if (item.id == payload.toastID) {
-                    if (payload.likes.length <= 0) {
-                        item.likes = [];
+                    if (payload.liked === true) {
+                        // like thành công
+                        item.likesCount += 1;
+                    } else if (payload.liked === false) {
+                        // dislike thành công
+                        item.likesCount -= 1;
                     } else {
-                        item.likes = [...payload.likes];
+                        // khác
                     }
                 }
                 return item;

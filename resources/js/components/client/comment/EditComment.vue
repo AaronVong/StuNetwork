@@ -11,7 +11,7 @@
             <h3 class="text-black text-lg md:text-xl mb-2">
                 Chỉnh sửa bình luận
             </h3>
-            <form @submit.prevent="this.handleSubmit">
+            <form @submit="this.handleSubmit">
                 <div>
                     <div
                         v-if="this.commentValidates.comment"
@@ -95,7 +95,8 @@ export default {
             // dialog không thể dùng trong popover nên phải dùng cách này
             this.$emit("toggleEditComment");
         },
-        async handleSubmit() {
+        async handleSubmit(e) {
+            e.preventDefault();
             const loading = this.$loading({
                 fullscreen: true,
                 text: "Đang xử lý, vui lòng chờ...",

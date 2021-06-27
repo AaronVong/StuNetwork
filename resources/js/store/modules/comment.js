@@ -3,7 +3,7 @@ export default {
     state() {
         return {
             errorMessage: "",
-            infoMessgae: "",
+            infoMessage: "",
             validates: {},
             commentList: [],
             replyList: [],
@@ -116,7 +116,7 @@ export default {
                     state.replyList.splice(index, 1);
                 }
             }
-            state.infoMessgae = payload.message;
+            state.infoMessage = payload.message;
         },
         updateCommentSuccess(state, payload) {
             if (payload.comment.child_id == null) {
@@ -142,7 +142,7 @@ export default {
             return state.errorMessage;
         },
         commentInfoMessage(state) {
-            return state.infoMessgae;
+            return state.infoMessage;
         },
         commentValidates(state) {
             return state.validates;

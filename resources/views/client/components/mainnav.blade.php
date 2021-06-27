@@ -6,19 +6,19 @@
     </div>
     <ul class="nav__navbar flex flex-col items-center lg:w-4/6 mb-3">
         <li class="pill relative mb-3 w-full h-12">
-            <a href="{{ route('home') }}" class="flex justify-evenly items-center w-full h-full pill-hover font-medium text-2xl text-gray-700">
+            <a href="{{ route('home') }}" class="{{Route::current()->getName() == 'home' ? 'text-blue-400' : ''}} flex justify-evenly items-center w-full h-full pill-hover font-medium text-2xl text-gray-700">
                 <i class="fas fa-home"></i>
                 <span class="hidden lg:inline-block lg:text-base xl:text-xl lg:w-4/6">Trang chủ</span>
             </a>
         </li>
         <li class="pill relative mb-3 w-full h-12">
-            <a href="{{ route('home') }}" class="flex justify-evenly items-center w-full h-full pill-hover font-medium text-2xl text-gray-700">
+            <a href="{{ route('chat') }}" class="{{Route::current()->getName() == 'chat' ? 'text-blue-400' : ''}} flex justify-evenly items-center w-full h-full pill-hover font-medium text-2xl text-gray-700">
                 <i class="far fa-envelope"></i>
                 <span class="hidden lg:inline-block lg:text-base xl:text-xl lg:w-4/6">Tin nhắn</span>
             </a>
         </li>
         <li class="pill relative mb-3 w-full h-12">
-            <a href="{{ route('profile', auth()->user()) }}" class="flex justify-evenly items-center w-full h-full pill-hover font-medium text-2xl text-gray-700">
+            <a href="{{ route('profile', auth()->user()) }}" class="{{Route::current()->getName() == 'profile' ? 'text-blue-400' : ''}} flex justify-evenly items-center w-full h-full pill-hover font-medium text-2xl text-gray-700">
                 <i class="far fa-user"></i>
                 <span class="hidden lg:inline-block lg:text-base xl:text-xl lg:w-4/6">Hồ sơ</span>
             </a>

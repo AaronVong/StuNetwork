@@ -22,7 +22,7 @@ import {
     ElInfiniteScroll,
 } from "element-plus";
 import "../scss/element-variables.scss";
-
+import "../scss/heart_animation.scss";
 /*
 |
 | Vue New Components
@@ -39,6 +39,7 @@ import ToastList from "./components/client/toast/ToastList";
 import Profile from "./components/client/profile/Profile";
 import Toast from "./components/client/toast/Toast";
 import Comments from "./components/client/comment/Comments";
+import ChatList from "./components/client/chat/ChatList";
 const app = createApp({
     components: {
         "register-form": RegisterForm,
@@ -52,6 +53,7 @@ const app = createApp({
         toast: Toast,
         profile: Profile,
         "toast-comments": Comments,
+        "chat-list": ChatList,
     },
 });
 

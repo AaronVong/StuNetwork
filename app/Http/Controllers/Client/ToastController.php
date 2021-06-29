@@ -97,7 +97,7 @@ class ToastController extends Controller
             $query->whereHas("followers", function($follower){
                 $follower->where("follower_id", auth()->user()->id);
             });
-        },"likes as likesCount"])->orderBy("created_at", "desc")->paginate(10)->items();
+        },"likes as likesCount"])->orderBy("created_at", "desc")->paginate(5)->items();
         return count($toasts) > 0 ? response(["toasts" => $toasts], 200) : response(["message" => "Không còn toast"], 204);
     }
 

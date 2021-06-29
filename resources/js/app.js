@@ -25,7 +25,7 @@ import "../scss/element-variables.scss";
 import "../scss/heart_animation.scss";
 /*
 |
-| Vue New Components
+| Vue Components
 |
 */
 import RegisterForm from "./components/client/auth/RegisterForm";
@@ -40,6 +40,7 @@ import Profile from "./components/client/profile/Profile";
 import Toast from "./components/client/toast/Toast";
 import Comments from "./components/client/comment/Comments";
 import ChatList from "./components/client/chat/ChatList";
+import Chat from "./components/client/chat/Chat";
 const app = createApp({
     components: {
         "register-form": RegisterForm,
@@ -54,6 +55,7 @@ const app = createApp({
         profile: Profile,
         "toast-comments": Comments,
         "chat-list": ChatList,
+        "chat-app": Chat,
     },
 });
 
@@ -74,3 +76,7 @@ app.use(store);
 app.mount("#app");
 
 /* App Script */
+import "jquery-ui/ui/widgets/draggable";
+$(document).ready(() => {
+    $("#chat-list-drag").draggable();
+});

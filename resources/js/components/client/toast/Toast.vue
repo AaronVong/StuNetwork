@@ -54,22 +54,15 @@
             />
         </div>
         <div class="toast__body w-full mb-3 px-3 min-h-full">
-            <div class="mb-3">
-                <!-- Toast contents place here -->
-                <a :href="`/toast/${toast.id}`" class="block w-full">
-                    <p>
-                        {{ toast.content }}
-                    </p>
-                </a>
-            </div>
-            <!-- Toast files place here -->
+            <div class="mb-3" v-html="this.linkDetector(toast.content)"></div>
             <div
-                :class="`w-full grid gird-row-auto grid-cols-${
+                :class="`w-full grid gird-row-auto grid-cols-1 md:grid-cols-${
                     toast.files.length > 2
                         ? Math.round(toast.files.length / 2)
                         : toast.files.length
                 } gap-2 items-center min-h-full`"
             >
+                <!-- Toast files place here -->
                 <ToastFile
                     v-for="(item, index) in toast.files"
                     :key="index"
@@ -80,42 +73,28 @@
         <div class="toast__footer w-full flex">
             <div class="flex pill justify-evenly w-full">
                 <!-- Like button here -->
-                <div>
+                <div class="flex items-center">
                     <button
-                        v-if="!this.likeable"
-                        @click="this.handleLike"
                         type="button"
-                        class="
-                            pill-hover pill-hover--cycle pill-hover--red
-                            focus:outline-none
-                            text-pink-600
-                        "
-                    >
-                        <i class="far fa-heart"></i>
-                    </button>
-                    <button
                         @click="this.handleLike"
-                        type="button"
-                        v-if="this.likeable"
-                        class="
-                            pill-hover pill-hover--cycle pill-hover--red
+                        :class="`HeartAnimation transition-all pill-hover pill-hover--cycle pill-hover--red
                             focus:outline-none
-                            text-pink-600
-                        "
-                    >
-                        <i class="fas fa-heart"></i>
-                    </button>
-                    {{ this.toast.likesCount }}
+                            ${this.liked ? 'heart-animated' : ''}`"
+                    ></button>
+                    <sup v-show="this.toast.likesCount > 0">
+                        {{ this.toast.likesCount }}
+                    </sup>
                 </div>
-                <div class="flex pill">
+                <div class="flex pill items-center">
                     <!-- Comment Form trigger place here -->
                     <button
                         class="
                             modal__btn
                             focus:outline-none
-                            text-indigo-600
+                            text-blue-500
                             pill-hover pill-hover--cycle
                         "
+                        style="width: 50px; height: 50px"
                         @click="
                             () => {
                                 this.showComment = !this.showComment;
@@ -125,7 +104,9 @@
                     >
                         <i class="fas fa-comment"></i>
                     </button>
-                    {{ this.toast.commentsCount }}
+                    <sup v-show="this.toast.commentCount > 0">
+                        {{ this.toast.commentsCount }}
+                    </sup>
                 </div>
             </div>
         </div>
@@ -145,25 +126,51 @@ import ToastTools from "./ToastTools.vue";
 import CommentForm from "../comment/CommentForm.vue";
 import { format, register } from "timeago.js";
 import { mapActions, mapGetters } from "vuex";
+import anchorme from "anchorme";
 export default {
     name: "Toast",
     data() {
         return {
             diffForHumans: "",
             showComment: false,
-            likeable: false,
         };
     },
     methods: {
         ...mapActions(["likeToastAction"]),
         async handleLike(e) {
             e.preventDefault();
-            this.likeable = await this.likeToastAction(this.toast.id);
-            if (this.likeable == null) {
+            const $target = $(e.target);
+            $target.prop("disabled", true);
+            if ($target.hasClass("heart-animated")) {
+                $target.removeClass("heart-animated");
+            } else {
+                $target.toggleClass("heart-animate");
+            }
+            const ok = await this.likeToastAction(this.toast.id);
+            if (ok == null) {
                 this.$message({
                     type: "error",
                     message: this.toastErrorMessage,
                 });
+            }
+            setTimeout(() => {
+                $target.prop("disabled", false);
+            }, 800);
+        },
+        linkDetector(text) {
+            try {
+                const result = anchorme({
+                    input: text,
+                    options: {
+                        attributes: {
+                            target: "_blank",
+                            class: "text-blue-500 hover:text-blue-600 hover:underline",
+                        },
+                    },
+                });
+                return result;
+            } catch (error) {
+                return text;
             }
         },
     },
@@ -178,7 +185,6 @@ export default {
     },
     components: { ToastFile, ToastTools, CommentForm },
     mounted() {
-        this.likeable = this.liked;
         const date = new Date(this.toast.created_at);
         const localeFnc = function (number, index, totalSec) {
             return [

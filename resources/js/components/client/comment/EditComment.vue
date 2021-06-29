@@ -107,18 +107,7 @@ export default {
             });
             if (ok == 200) {
                 this.localToggleEditComment();
-                this.$message({
-                    message: this.commentInfoMessage,
-                    type: "success",
-                });
                 this.content = "";
-            } else {
-                if (ok != 422) {
-                    this.$message({
-                        message: this.commentErrorMessage,
-                        type: "error",
-                    });
-                }
             }
             loading.close();
         },

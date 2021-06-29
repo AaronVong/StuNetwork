@@ -19,11 +19,18 @@
         </template>
         <template #default>
             <div class="w-full flex justify-center items-center">
-                <img :src="file.url" :alt="file.name" class="rounded-3xl" />
+                <img
+                    :src="file.url"
+                    :alt="file.name"
+                    class="rounded-3xl max-w-full max-h-full"
+                />
             </div>
         </template>
     </el-skeleton>
-    <div v-else class="w-full flex justify-center items-center h-60">
+    <div
+        v-else
+        class="w-full flex justify-center items-center max-w-full h-60 max-h-64"
+    >
         <iframe
             class="w-full h-full"
             v-bind:src="`https://drive.google.com/file/d/${file.id}/preview`"

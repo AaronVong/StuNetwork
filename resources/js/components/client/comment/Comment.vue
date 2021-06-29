@@ -61,7 +61,7 @@
                     class="
                         modal__btn
                         focus:outline-none
-                        text-indigo-600
+                        text-blue-500
                         pill-hover pill-hover--cycle
                     "
                     @click="this.toggleCommentForm"

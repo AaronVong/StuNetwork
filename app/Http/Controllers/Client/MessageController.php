@@ -13,7 +13,7 @@ class MessageController extends Controller
     }
 
     public function index(Request $request){
-        $followings = User::with(["followings:user_id,id,avatarUrl,fullname"])->where("id", auth()->user()->id)->first();
+        $followings = $request->user()->followings;
         return view("client/pages.chat", ["followings" => $followings]);
     }
 }

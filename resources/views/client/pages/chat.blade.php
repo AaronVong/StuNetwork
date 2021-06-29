@@ -9,8 +9,8 @@
         </div>
         <div class="relative col-span-3 lg:col-span-2">
             <!-- Web Contents Here -->
-            Chat App
+            <chat-app></chat-app>
         </div>
-        <chat-list></chat-list>
+        <chat-list v-bind:chat_list="{{ $followings }}"></chat-list>
     </div>
 @endsection

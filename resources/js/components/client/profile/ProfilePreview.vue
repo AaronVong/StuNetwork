@@ -24,7 +24,7 @@
                 >
                     <span class="font-medium">{{ profile.fullname }}</span>
                 </a>
-                <span class="font-normal text-gray-500 emphasis"
+                <span class="font-normal text-gray-500"
                     ><i>{{ profile.username }}</i></span
                 >
             </div>
@@ -79,10 +79,10 @@ export default {
         async handleUnfollow(id) {
             this.loading = true;
             await this.toggleFollow(id);
-            const newFollowings = this.followings.filter(
-                (profile) => profile.id != id
-            );
-            this.setFollowingsList(newFollowings);
+            // const newFollowings = this.followings.filter(
+            //     (profile) => profile.id != id
+            // );
+            // this.setFollowingsList(newFollowings);
             this.loading = false;
         },
     },

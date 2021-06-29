@@ -26,9 +26,7 @@
         <div
             class="
                 flex flex-col
-                md:flex-row
-                md:items-center
-                md:flex-wrap
+                md:flex-row md:items-center md:flex-wrap
                 gap-2
                 text-gray-600
             "
@@ -52,7 +50,7 @@
             <div class="flex items-center">
                 <span class="mr-2"><i class="far fa-address-card"></i></span>
                 <span class="capitalize">
-                    {{ this.rolename }}
+                    {{ this.rolename ? this.rolename : "Không xác định" }}
                 </span>
             </div>
         </div>

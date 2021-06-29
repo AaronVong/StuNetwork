@@ -1,11 +1,6 @@
 <template>
-    <div class="infinite-list-wrapper border-b" style="overflow: auto">
-        <ul
-            v-infinite-scroll="this.load"
-            infinite-scroll-disabled="disabled"
-            class="divide-y list"
-            ref="toastList"
-        >
+    <div class="border-b">
+        <ul class="divide-y infinite-list-wrapper" style="overflow: auto">
             <Toast
                 v-for="(toast, index) in this.toastList"
                 :key="index"
@@ -15,7 +10,15 @@
                 :followed="toast.followed == 1"
             ></Toast>
         </ul>
-        <p v-if="loading">Loading...</p>
+        <div v-if="this.loading">
+            <img
+                src="/images/Pulse-1s-200px.svg"
+                class="w-full h-16 bg-transparent"
+            />
+        </div>
+        <div v-if="this.noMore" class="text-lg text-center py-3 font-bold">
+            Không còn toast để tải
+        </div>
     </div>
 </template>
 <script>
@@ -25,6 +28,8 @@ export default {
     data() {
         return {
             loading: false,
+            noMore: false,
+            count: 0,
         };
     },
     methods: {
@@ -33,10 +38,7 @@ export default {
             "getProfilesFollowedByUserId",
         ]),
         ...mapMutations(["setToastList"]),
-        load() {},
-        disabled() {
-            return this.loading;
-        },
+        async loadMoreToast() {},
     },
     props: {
         owner: Number,
@@ -47,15 +49,31 @@ export default {
     },
     components: { Toast },
     mounted() {
-        // const getFollowings = async () => {
-        //     // dành cho việc quick follow trong toast tools
-        //     await this.getProfilesFollowedByUserId(this.owner);
-        // };
         if (this.toast_list) {
-            // khi vào trang home
             this.setToastList(this.toast_list);
-            // getFollowings();
         }
+        const regex = new RegExp("^(/toast)/[0-9]+$", "i");
+        const result = regex.test(window.location.pathname);
+        if (result) {
+            // nếu đang trang chi tiết toast không chạy infinite scroll
+            return;
+        }
+        window.addEventListener("scroll", async () => {
+            const { scrollTop, scrollHeight, clientHeight } =
+                document.documentElement;
+
+            // console.log({ scrollTop, scrollHeight, clientHeight });
+
+            if (clientHeight + scrollTop >= scrollHeight - 5) {
+                if (this.noMore || this.loading) {
+                    return;
+                }
+                this.loading = true;
+                this.noMore = await this.toastListPaginateAction();
+                console.log(this.noMore);
+                this.loading = false;
+            }
+        });
     },
 };
 </script>

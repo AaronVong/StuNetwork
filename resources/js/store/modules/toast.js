@@ -16,11 +16,12 @@ export default {
                 const response = await axios.get(`/toast?page=${state.page}`);
                 if (response.status == 200) {
                     commit("toastListPaginateSuccess", response.data);
+                    return false;
                 }
             } catch (error) {
                 commit("toastActionFail", error.response);
             }
-            return;
+            return true;
         },
         /* Tạo mới Toast */
         async createToastAction({ commit }, formData) {

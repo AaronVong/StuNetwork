@@ -68,6 +68,10 @@ html {
   background-color: #3b83f61f;
 }
 
+.transition-width {
+  transition: width 200ms linear;
+}
+
 /*
 |--------------------------------------------------------------------------
 | Auth CSS
@@ -114,6 +118,7 @@ html {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+  font-size: 14px;
 }
 
 .unfollow:hover::before {
@@ -139,6 +144,58 @@ html {
 .btn-basic:hover {
   background-color: #2563eb;
 }
+
+/*
+|--------------------------------------------------------------------------
+| Twitter Heart
+|--------------------------------------------------------------------------
+*/
+
+.HeartAnimation {
+  background-image: url("/images/web_heart_animation.png");
+  background-repeat: no-repeat;
+  background-size: 2900%;
+  background-position: left;
+  width: 50px;
+  height: 50px;
+  margin: 0 auto;
+  cursor: pointer;
+}
+
+.heart-animate {
+  -webkit-animation: heart-burst 0.8s steps(28) forwards;
+          animation: heart-burst 0.8s steps(28) forwards;
+}
+
+.heart-animated {
+  background-position: right;
+}
+
+@-webkit-keyframes heart-burst {
+  0% {
+    background-position: left;
+  }
+
+  100% {
+    background-position: right;
+  }
+}
+
+@keyframes heart-burst {
+  0% {
+    background-position: left;
+  }
+
+  100% {
+    background-position: right;
+  }
+}
+
+/*
+|--------------------------------------------------------------------------
+| Chat App
+|--------------------------------------------------------------------------
+*/
 
 /*! tailwindcss v2.2.4 | MIT License | https://tailwindcss.com */
 

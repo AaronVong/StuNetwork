@@ -38,7 +38,7 @@ const toast = {
                 const response = await axios.post("/profile/follow", {
                     profile_id,
                 });
-                commit("setFollowState", response.data.followed);
+                commit("toggleFollowSucces", response.data);
             } catch (error) {
                 commit("profileActionFail", error.response);
             }
@@ -70,8 +70,11 @@ const toast = {
         setFollowingsList(state, payload) {
             state.followings = [...payload];
         },
-        setFollowState(state, payload) {
-            state.followed = payload;
+        toggleFollowSucces(state, payload) {
+            state.followed = payload.followed;
+            state.followings = state.followings.filter(
+                (item) => item.id != payload.profileId
+            );
         },
         setProfile(state, payload) {
             state.profile = { ...payload };

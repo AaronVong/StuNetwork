@@ -16,12 +16,12 @@ class ProfileController extends Controller
 {
     private $rules = [
         "fullname" => ["required", "max:255"],
-        "phone" => ["required","digits_between:10,11"],
-        "address" => ["required","max:255"],
-        "birthday" => ["required","date"],
+        "phone" => ["nullable","digits_between:10,11"],
+        "address" => ["nullable","max:255"],
+        "birthday" => ["nullable","date"],
         "gender" => ["required","boolean"],
-        "avatar" => ["mimes:jpg,jpeg,png", "max:3192", "mimetypes:image/jpg,image/jpeg,image/png"],
-        "background" => ["mimes:jpg,jpeg,png", "max:3192", "mimetypes:image/jpg,image/jpeg,image/png"]
+        "avatar" => ["nullable","mimes:jpg,jpeg,png", "max:3192", "mimetypes:image/jpg,image/jpeg,image/png"],
+        "background" => ["nullable","mimes:jpg,jpeg,png", "max:3192", "mimetypes:image/jpg,image/jpeg,image/png"]
     ];
     private $messages = [
         "fullname.required" => "Họ tên không thể để trống",
@@ -130,7 +130,7 @@ class ProfileController extends Controller
                     $request->user()->followings()->attach($request->profile_id);
                     $isFollowed = true;
                 }
-                return response(["followed" => $isFollowed],200);
+                return response(["followed" => $isFollowed, "profileId" => $request->profile_id],200);
             }else{
                 return response(["message" => $response->message()], 403);
             }

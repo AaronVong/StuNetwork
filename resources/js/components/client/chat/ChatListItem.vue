@@ -9,6 +9,8 @@
             p-3
             cursor-pointer
             border-b
+            lg:border-gray-100
+            border-white
         "
     >
         <div class="shirk-0 grow-0 w-16 rounded-full">

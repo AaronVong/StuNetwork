@@ -19,7 +19,8 @@
                 <div class="flex items-center justify-center w-20 h-full">
                     <button
                         type="submit"
-                        :class="`                            flex
+                        :class="`
+                            flex
                             items-center
                             justify-center
                             h-1/2
@@ -43,23 +44,24 @@
 </template>
 
 <script>
+import Message from "./Message.vue";
 export default {
     name: "Chat",
     data() {
         return {
             form: {
                 message: "",
-                files: [],
             },
         };
     },
     computed: {},
-    components: {},
+    components: { Message },
     methods: {
         handleSendMessage(e) {
             e.preventDefault();
             if (!this.form.message) return;
-            alert(this.form.message);
+
+            this.form.message = "";
         },
     },
 };

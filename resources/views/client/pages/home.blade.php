@@ -13,7 +13,7 @@
     </div>
     <div class="w-full">
         <!-- Toast List Here -->
-        <toast-list v-bind:owner="{{ auth()->user()->id }}" v-bind:toast_list="{{ json_encode($toasts) }}"></toast-list>
+        <toast-list v-bind:owner="{{ auth()->user()->id }}" v-bind:guest="{{ auth()->user()->id }}" v-bind:toast_list="{{ json_encode($toasts) }}"></toast-list>
     </div>
 </div>
 @endsection

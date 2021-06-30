@@ -76,6 +76,9 @@ const toast = {
                 (item) => item.id != payload.profileId
             );
         },
+        setFollowState(state, payload) {
+            state.followed = payload;
+        },
         setProfile(state, payload) {
             state.profile = { ...payload };
         },

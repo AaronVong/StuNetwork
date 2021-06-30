@@ -61,7 +61,7 @@ class ToastController extends Controller
             $query->whereHas("followers", function($follower){
                 $follower->where("follower_id", auth()->user()->id);
             });
-        },"likes as likesCount"])->where("user_id", $id)->orderBy("created_at", "desc")->get();
+        },"likes as likesCount"])->where("user_id", $id)->orderBy("created_at", "desc")->paginate(5)->items();
         return $toasts;
     }
 
@@ -72,7 +72,7 @@ class ToastController extends Controller
             $query->whereHas("followers", function($follower){
                 $follower->where("follower_id", auth()->user()->id);
             });
-        },"likes as likesCount"])->whereHas("likes", function ($query) use($id) {return $query->where("user_id", $id);})->orderBy("created_at", "desc")->get();
+        },"likes as likesCount"])->whereHas("likes", function ($query) use($id) {return $query->where("user_id", $id);})->orderBy("created_at", "desc")->paginate(5)->items();
         return $toasts;
     }
 
@@ -237,7 +237,7 @@ class ToastController extends Controller
             throw new HttpException(404);
         }
         $toasts = $this->getToastsUploadedByUserId($request->user_id);
-        return $toasts ? response(["toasts" => $toasts, "followings" => $request->user()->followings], 200):response(["message" => "Không tìm thấy người dùng!", "toasts"=>[]], 404);
+        return count($toasts)>0 ? response(["toasts" => $toasts, "followings" => $request->user()->followings], 200):response([], 204);
     }
 
     public function toastsLikedById(Request $request){
@@ -245,6 +245,6 @@ class ToastController extends Controller
             throw new HttpException(404);
         }
         $toasts = $this->getToastsLikedByUserId($request->user_id);
-        return $toasts ? response(["toasts" => $toasts, "followings" => $request->user()->followings], 200):response(["message" => "Không tìm thấy người dùng!", "toasts"=>[]], 404);
+        return count($toasts) > 0 ? response(["toasts" => $toasts, "followings" => $request->user()->followings], 200) : response([], 204);
     }
 }

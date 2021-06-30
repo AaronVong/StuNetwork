@@ -6,13 +6,26 @@
             class="w-full h-16 bg-transparent"
         />
         <el-tab-pane label="Đã đăng" name="toasted">
-            <ToastList :owner="this.visitor" />
+            <ToastList
+                v-if="this.activeTab == 'toasted'"
+                :owner="this.user_id"
+                :guest="this.visitor"
+                :defaultAction="'uploaded'"
+            />
         </el-tab-pane>
         <el-tab-pane label="Đã thích" name="liked">
-            <ToastList :owner="this.visitor" />
+            <ToastList
+                v-if="this.activeTab == 'liked'"
+                :owner="this.user_id"
+                :guest="this.visitor"
+                :defaultAction="'liked'"
+            />
         </el-tab-pane>
         <el-tab-pane label="Đã theo dõi" name="followings">
-            <ProfilePreview :owned="this.owned" />
+            <ProfilePreview
+                :owned="this.owned"
+                v-if="this.activeTab == 'followings'"
+            />
         </el-tab-pane>
     </el-tabs>
 </template>
@@ -48,14 +61,18 @@ export default {
             "getToastListFollowedByUserId",
             "getProfilesFollowedByUserId",
         ]),
-        ...mapMutations(["setToastList"]),
+        ...mapMutations(["setToastList", "setPage"]),
         async handleTabClick(tab, event) {
+            this.clickTab = true;
+            this.setToastList([]);
             this.loading = true;
             switch (tab.props.name) {
                 case "toasted":
+                    this.setPage(1);
                     await this.getToastListUploadedByUserId(this.user_id);
                     break;
                 case "liked":
+                    this.setPage(1);
                     await this.getToastListLikedByUserId(this.user_id);
                     break;
                 case "followings":
@@ -65,11 +82,11 @@ export default {
                     break;
             }
             this.loading = false;
+            this.clickTab = false;
         },
     },
     async mounted() {
         await this.getToastListUploadedByUserId(this.user_id);
-        this.toastedList = [...this.toastList];
     },
 };
 </script>

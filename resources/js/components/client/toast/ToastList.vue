@@ -5,7 +5,9 @@
                 v-for="(toast, index) in this.toastList"
                 :key="index"
                 :toast="toast"
-                :owned="this.owner === toast.user.id"
+                :owned="
+                    this.owner === toast.user.id && this.owner === this.guest
+                "
                 :liked="toast.liked == 1"
                 :followed="toast.followed == 1"
             ></Toast>
@@ -36,16 +38,38 @@ export default {
         ...mapActions([
             "toastListPaginateAction",
             "getProfilesFollowedByUserId",
+            "getToastListUploadedByUserId",
+            "getToastListLikedByUserId",
         ]),
         ...mapMutations(["setToastList"]),
         async loadMoreToast() {},
     },
     props: {
+        // user hiện hành (user đang đăng nhập)
         owner: Number,
+        // user xem danh sách
+        guest: Number,
         toast_list: { type: Array, default: null },
+        // Loại list sẽ được sử dụng
+        // list : mặc định,
+        // uploaded: toast đã được upload bởi user,
+        // liked: toast được like bởi user
+        defaultAction: {
+            type: String,
+            default: "list",
+        },
     },
     computed: {
         ...mapGetters(["toastList", "followings"]),
+    },
+    watch: {
+        defaultAction: {
+            handler: function (newval, oldVal) {
+                console.log("updated");
+                // this.noMore = false;
+            },
+            immediate: true,
+        },
     },
     components: { Toast },
     mounted() {
@@ -69,8 +93,18 @@ export default {
                     return;
                 }
                 this.loading = true;
-                this.noMore = await this.toastListPaginateAction();
-                console.log(this.noMore);
+                if (this.defaultAction == "uploaded") {
+                    this.noMore = await this.getToastListUploadedByUserId(
+                        this.owner
+                    );
+                } else if (this.defaultAction == "liked") {
+                    this.noMore = await this.getToastListLikedByUserId(
+                        this.owner
+                    );
+                } else {
+                    this.noMore = await this.toastListPaginateAction();
+                }
+                // console.log(this.noMore);
                 this.loading = false;
             }
         });

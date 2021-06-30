@@ -6,8 +6,9 @@
         element-loading-text="Đang xử lý, vui lòng chờ..."
     >
         <form method="POST" @submit.prevent="this.handleCommentSubmit">
-            <div>
-                <textarea
+            <div class="mb-2">
+                <input
+                    type="text"
                     v-model="this.content"
                     class="
                         focus:outline-none
@@ -16,12 +17,13 @@
                         bg-transparent
                         text-lg text-black
                         p-3
+                        h-16
                         border
+                        rounded-lg
                     "
                     placeholder="Viết bình luận..."
-                    rows="3"
                     name="content"
-                ></textarea>
+                />
             </div>
             <span
                 class="inline-block text-red-500 mb-3"

@@ -96,31 +96,48 @@ export default {
             }
         },
         /* Lấy danh sách Toasts được upload bởi người dùng */
-        async getToastListUploadedByUserId({ commit }, id) {
+        async getToastListUploadedByUserId({ commit, state }, id) {
             try {
-                const response = await axios.post("/toast/uploaded", {
-                    user_id: id,
-                });
-                commit("setToastList", response.data.toasts);
-                commit("setFollowingsList", response.data.followings);
+                const response = await axios.post(
+                    `/toast/uploaded?page=${state.page}`,
+                    {
+                        user_id: id,
+                    }
+                );
+                if (response.status == 200) {
+                    commit("toastListPaginateSuccess", response.data);
+                    // commit("setFollowingsList", response.data.followings);
+                    return false;
+                }
             } catch (error) {
                 commit("toastActionFail", error.response);
             }
+            return true;
         },
         /* Lấy danh sách Toasts được like bởi người dùng */
-        async getToastListLikedByUserId({ commit }, id) {
+        async getToastListLikedByUserId({ commit, state }, id) {
             try {
-                const response = await axios.post("/toast/liked", {
-                    user_id: id,
-                });
-                commit("setToastList", response.data.toasts);
-                commit("setFollowingsList", response.data.followings);
+                const response = await axios.post(
+                    `/toast/liked?page=${state.page}`,
+                    {
+                        user_id: id,
+                    }
+                );
+                if (response.status == 200) {
+                    commit("toastListPaginateSuccess", response.data);
+                    // commit("setFollowingsList", response.data.followings);
+                    return false;
+                }
             } catch (error) {
                 commit("toastActionFail", error.response);
             }
+            return true;
         },
     },
     mutations: {
+        setPage(state, payload = 1) {
+            state.page = payload;
+        },
         toastActionFail(state, payload) {
             if (payload.status == 422) {
                 state.validates = { ...payload.data.validates };
@@ -132,8 +149,13 @@ export default {
             state.infoMessage = payload.message;
         },
         setToastList(state, payload) {
-            state.toastList = [...payload];
-            state.page += 1;
+            if (payload.length <= 0) {
+                // nếu truyền mảng rỗng => reset
+                state.toastList = [];
+            } else {
+                state.toastList = [...payload];
+                state.page += 1;
+            }
         },
         // lấy danh sách toast đã phân trang
         toastListPaginateSuccess(state, payload) {

@@ -104,7 +104,7 @@
                     >
                         <i class="fas fa-comment"></i>
                     </button>
-                    <sup v-show="this.toast.commentCount > 0">
+                    <sup v-show="this.toast.commentsCount > 0">
                         {{ this.toast.commentsCount }}
                     </sup>
                 </div>

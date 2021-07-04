@@ -7,10 +7,10 @@
                @include("client/components.mainnav")
             </div>
         </div>
-        <div class="relative col-span-3 lg:col-span-2">
+        <div class="relative col-span-3 xl:col-span-2">
             <!-- Web Contents Here -->
-            <chat-app></chat-app>
+            <chat-app v-bind:user="{{ auth()->user() }}"></chat-app>
         </div>
-        <chat-list v-bind:chat_list="{{ $followings }}"></chat-list>
+        <chat-list v-bind:chat_list="{{ auth()->user()->followings }}"></chat-list>
     </div>
 @endsection

@@ -14,7 +14,8 @@
         "laravel/tinker": "^2.5",
         "laravelista/comments": "^4.5",
         "nao-pon/flysystem-google-drive": "~1.1",
-        "overtrue/laravel-like": "^4.0"
+        "overtrue/laravel-like": "^4.0",
+        "pusher/pusher-php-server": "^7.0"
     },
     "require-dev": {
         "facade/ignition": "^2.5",

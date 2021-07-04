@@ -17,12 +17,12 @@
             flex
             items-center
             justify-center
-            lg:hidden
+            xl:hidden
         "
     >
         <button
             type="button"
-            @click="openChatList"
+            @click="this.toggleChatList"
             class="text-white cursor-pointer"
         >
             <i class="far fa-comment-dots text-medium"></i>
@@ -34,19 +34,18 @@
             col-span-1
             absolute
             right-0
-            right-0
             top-0
             w-0
             h-full
             overflow-x-hidden
             bg-gray-200
-            lg:bg-white
+            xl:bg-white
             ${this.visible ? 'w-2/5' : ''}
             flex flex-col
             border-r
             border-l
             lg:border-l-0
-            lg:relative lg:w-full lg:h-full
+            xl:relative xl:w-full xl:h-full
             `"
     >
         <div
@@ -57,6 +56,7 @@
                 v-for="(item, index) in this.followings"
                 :key="index"
                 :profile="item"
+                v-on:itemClicked="this.toggleChatList"
             />
         </div>
         <div
@@ -85,7 +85,7 @@
                 flex
                 justify-center
                 items-center
-                lg:hidden
+                xl:hidden
             "
         >
             <i class="fas fa-times fa-2x"></i>
@@ -115,8 +115,8 @@ export default {
     components: { ChatListItem },
     methods: {
         ...mapMutations(["setFollowingsList"]),
-        openChatList() {
-            this.visible = true;
+        toggleChatList() {
+            this.visible = !this.visible;
         },
     },
     mounted() {

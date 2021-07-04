@@ -45,18 +45,17 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
         'email_verified_at' => 'datetime',
     ];
 
+    /**
+     * 
+     * Relationships
+     * 
+     */
     function profile(){
         return $this->hasOne(Profile::class,"user_id","id");
     }
 
-
     function roles(){
         return $this->belongsToMany(Role::class);
-    }
-
-    function isStudent(){
-	    $domain = substr($this->email, strpos($this->email,"@")+1);
-        return $domain !== false ? strpos($domain,"student"): false;
     }
 
     public function toasts(){
@@ -69,5 +68,18 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
 
     public function followedCount(){
         return DB::table("user_follows")->where("following_id" ,"=",$this->id)->count();
+    }
+
+    public function messages(){
+        return $this->hasMany(Message::class,"sender_id", "id");
+    }
+    /**
+     * 
+     * Helper
+     * 
+     */
+    function isStudent(){
+	    $domain = substr($this->email, strpos($this->email,"@")+1);
+        return $domain !== false ? strpos($domain,"student"): false;
     }
 }

@@ -26,11 +26,24 @@
                             border border-gray-500
                         "
                     />
-                    <img
+                    <div
                         v-else
-                        src="http://via.placeholder.com/50"
-                        class="w-full rounded-full border border-gray-500"
-                    />
+                        class="
+                            shirk-0
+                            grow-0
+                            rounded-full
+                            flex
+                            items-center
+                            justify-center
+                            bg-blue-700
+                            text-white
+                            w-24
+                            h-24
+                            md:w-32 md:h-32
+                        "
+                    >
+                        {{ this.profile.fullname.split(" ").pop() }}
+                    </div>
                 </div>
                 <!-- Edit profile button place here-->
                 <EditProfileForm

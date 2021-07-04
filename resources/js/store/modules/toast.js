@@ -149,7 +149,7 @@ export default {
             state.infoMessage = payload.message;
         },
         setToastList(state, payload) {
-            if (payload.length <= 0) {
+            if (!payload) {
                 // nếu truyền mảng rỗng => reset
                 state.toastList = [];
             } else {

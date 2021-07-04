@@ -1,5 +1,6 @@
 <template>
     <div
+        @click="handleChatWith"
         class="
             w-full
             flex
@@ -13,11 +14,29 @@
             border-white
         "
     >
-        <div class="shirk-0 grow-0 w-16 rounded-full">
+        <div class="shirk-0 grow-0 w-16 rounded-full border">
             <img
+                v-if="this.profile.avatarUrl"
                 :src="this.profile.avatarUrl"
-                class="block w-full rounded-full border"
+                class="block w-full h-16 rounded-full"
             />
+            <div
+                v-else
+                class="
+                    shirk-0
+                    grow-0
+                    w-16
+                    h-16
+                    rounded-full
+                    flex
+                    items-center
+                    justify-center
+                    bg-blue-700
+                    text-white
+                "
+            >
+                {{ this.profile.fullname.split(" ").pop() }}
+            </div>
         </div>
         <div
             class="
@@ -31,7 +50,7 @@
         >
             <a
                 :href="`/profile/${this.profile.user.username}`"
-                class="hover:underline"
+                class="hover:underline truncate"
             >
                 {{ this.profile.fullname }}
             </a>
@@ -65,7 +84,7 @@
 </template>
 
 <script>
-import { mapActions } from "vuex";
+import { mapActions, mapMutations } from "vuex";
 export default {
     name: "ChatListItem",
     data() {
@@ -80,6 +99,7 @@ export default {
         },
     },
     methods: {
+        ...mapMutations(["changeChatWith"]),
         ...mapActions(["toggleFollow"]),
         async handleUnfollow(e) {
             e.preventDefault();
@@ -87,6 +107,12 @@ export default {
             await this.toggleFollow(this.profile.id);
             this.loading = false;
         },
+        handleChatWith(e) {
+            e.preventDefault();
+            this.changeChatWith(this.profile);
+            this.$emit("itemClicked");
+        },
     },
+    emits: ["itemClicked"],
 };
 </script>

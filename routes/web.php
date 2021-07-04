@@ -76,7 +76,12 @@ Route::middleware(["verified", "auth"])->group(function(){
     Route::put("/comment/{id}",[ToastCommentController::class, "update"]);
     Route::delete("/comment/{id}",[ToastCommentController::class, "destroy"]);
 
-    Route::get("/messages", [MessageController::class, "index"])->name("chat");
+    Route::get("/chat", [MessageController::class, "index"])->name("chat");
+    Route::get("/messages/{receiver_id}", [MessageController::class, "fetchMessages"])->name("chat.fetch");
+     Route::post("/messages/{receiver_id}", [MessageController::class, "sendMessage"])->name("chat.send");
+    # Route::get("/messages", [MessageController::class, "fetchMessages"])->name("chat.fetch");
+    # Route::post("/messages", [MessageController::class, "sendMessage"])->name("chat.send");
+   
 });
 
 

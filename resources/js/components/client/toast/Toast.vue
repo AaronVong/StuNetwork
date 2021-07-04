@@ -14,18 +14,24 @@
                         border border-gray-500
                     "
                 />
-                <img
+                <div
                     v-else
-                    src="https://via.placeholder.com/50"
                     class="
-                        block
-                        md:w-16 md:h-16
+                        shirk-0
+                        grow-0
                         rounded-full
+                        flex
+                        items-center
+                        justify-center
+                        bg-blue-700
+                        text-white
+                        md:w-16 md:h-16
                         h-12
                         w-12
-                        border border-gray-500
                     "
-                />
+                >
+                    {{ toast.owner_profile.fullname.split(" ").pop() }}
+                </div>
             </div>
             <div class="flex flex-col">
                 <a

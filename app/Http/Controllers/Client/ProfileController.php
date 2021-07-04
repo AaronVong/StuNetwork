@@ -18,7 +18,7 @@ class ProfileController extends Controller
         "fullname" => ["required", "max:255"],
         "phone" => ["nullable","digits_between:10,11"],
         "address" => ["nullable","max:255"],
-        "birthday" => ["nullable","date"],
+        "birthday" => ["nullable","date",],
         "gender" => ["required","boolean"],
         "avatar" => ["nullable","mimes:jpg,jpeg,png", "max:3192", "mimetypes:image/jpg,image/jpeg,image/png"],
         "background" => ["nullable","mimes:jpg,jpeg,png", "max:3192", "mimetypes:image/jpg,image/jpeg,image/png"]

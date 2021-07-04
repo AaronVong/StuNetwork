@@ -41,7 +41,7 @@ export default {
             "getToastListUploadedByUserId",
             "getToastListLikedByUserId",
         ]),
-        ...mapMutations(["setToastList"]),
+        ...mapMutations(["setToastList", "setPage", "setToastList"]),
         async loadMoreToast() {},
     },
     props: {
@@ -64,9 +64,8 @@ export default {
     },
     watch: {
         defaultAction: {
-            handler: function (newval, oldVal) {
-                console.log("updated");
-                // this.noMore = false;
+            handler: function (newVal, oldVal) {
+                this.noMore = false;
             },
             immediate: true,
         },
@@ -89,20 +88,24 @@ export default {
             // console.log({ scrollTop, scrollHeight, clientHeight });
 
             if (clientHeight + scrollTop >= scrollHeight - 5) {
-                if (this.noMore || this.loading) {
+                if (this.noMore || this.loading || this.toastList.length == 0) {
+                    console.log("stopped");
                     return;
                 }
                 this.loading = true;
-                if (this.defaultAction == "uploaded") {
+                if (this.defaultAction == "toasted") {
                     this.noMore = await this.getToastListUploadedByUserId(
                         this.owner
                     );
+                    console.log("toast list");
                 } else if (this.defaultAction == "liked") {
                     this.noMore = await this.getToastListLikedByUserId(
                         this.owner
                     );
+                    console.log("toast list");
                 } else {
                     this.noMore = await this.toastListPaginateAction();
+                    console.log("toast list");
                 }
                 // console.log(this.noMore);
                 this.loading = false;

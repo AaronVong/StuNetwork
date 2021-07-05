@@ -67,7 +67,16 @@ export default {
             e.preventDefault();
             if (!this.form.message) return;
             this.form.receiver_id = this.userChatWith.user_id;
-            await this.sendMessageAction(this.form);
+            const ok = await this.sendMessageAction(this.form);
+            if (ok) {
+                Echo.private(
+                    `stunetwork-chanel_${this.userChatWith.user_id}`
+                ).whisper("sent", {
+                    user: this.chatUser,
+                    sent: true,
+                    message: this.form.message,
+                });
+            }
             this.form.message = "";
         },
         handleTyping() {

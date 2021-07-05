@@ -2,7 +2,9 @@
 
 namespace App\Providers;
 
+use App\Models\Message;
 use App\Policies\CommentPolicy;
+use App\Policies\MessagePolicy;
 use App\Policies\ProfilePolicy;
 use App\Policies\ToastPolicy;
 use App\Policies\UserPolicy;
@@ -25,6 +27,7 @@ class AuthServiceProvider extends ServiceProvider
         User::class => UserPolicy::class,
         Profile::class => ProfilePolicy::class,
         Comment::class => CommentPolicy::class,
+        Message::class => MessagePolicy::class,
     ];
 
     /**

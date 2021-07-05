@@ -22,9 +22,11 @@ export default {
                     }
                 );
                 commit("sendMessagesSuccess", response.data);
+                return true;
             } catch (error) {
                 commit("chatActionFail", error.response);
             }
+            return false;
         },
         async fetchMessagesAction({ commit, state }, receiver_id) {
             try {
@@ -40,6 +42,30 @@ export default {
             }
             return true;
         },
+
+        async deleteMessageAction(
+            { commit, state },
+            { message_id, receiver_id }
+        ) {
+            try {
+                const response = await axios.delete(
+                    `/messages/${receiver_id}/${message_id}`
+                );
+                if (response.status == 200) {
+                    commit("deleteMessagesSuccess", response.data);
+                    Echo.private(
+                        `stunetwork-chanel_${response.data.receiver.id}`
+                    ).whisper("delete-message", {
+                        message_id: response.data.message_id,
+                        sender: state.user,
+                    });
+                    return true;
+                }
+            } catch (error) {
+                commit("chatActionFail", error.response);
+            }
+            return false;
+        },
     },
     mutations: {
         chatActionFail(state, payload) {
@@ -53,8 +79,18 @@ export default {
             state.messages.push(payload.message);
         },
         fetchMessagesSuccess(state, payload) {
-            state.messages = [...payload.messages, ...state.messages];
+            let array = [...payload.messages];
+            state.messages.unshift(...array.reverse());
             state.page += 1;
+        },
+        deleteMessagesSuccess(state, payload) {
+            state.messages = state.messages.map((item) => {
+                if (item.id == payload.message_id) {
+                    item.deleted = true;
+                    item.message = "Tin nhắn đã bị xóa";
+                }
+                return item;
+            });
         },
         changeChatWith(state, payload) {
             state.chatWith = { ...payload };

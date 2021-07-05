@@ -8,6 +8,7 @@ use App\Models\Message;
 use App\Models\User;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Validator;
 
 class MessageController extends Controller
@@ -28,8 +29,8 @@ class MessageController extends Controller
             return response(["message" => "Không tìm thấy cuộc trò chuyện"], 404);
         }
         $messages = Message::with("sender", "receiver")->where(["receiver_id"=> $receiver_id, "sender_id" => auth()->user()->id])->orWhere(function ($query) use($receiver_id){
-            $query->where(["sender_id"=> $receiver_id,"receiver_id" => auth()->user()->id]);
-        })->orderby("created_at", "asc")->paginate(10)->items();
+            $query->where(["sender_id"=> $receiver_id,"receiver_id" => auth()->user()->id])->orderBy("created_at", "DESC");
+        })->orderby("created_at", "DESC")->paginate(10)->items();
         return count($messages) > 0 ? response(["messages" => $messages], 200 ): response([],204);
     }
 
@@ -52,5 +53,19 @@ class MessageController extends Controller
         catch(Exception $error){
             return response(["message" => $error->getMessage()],500);
         } 
+    }
+
+    public function deleteMessage(Request $request, $receiver_id, $message_id){
+        $message = Message::where(["id" => $message_id, "receiver_id" => $receiver_id, "sender_id" => auth()->user()->id])->first();
+        if(!$message){
+            return response(["message" => "Tin nhắn không tồn tại"], 404);
+        }
+        $response = Gate::inspect("delete", $message);
+        if($response->allowed()){
+            $receiver= $message->receiver; 
+            $message->delete();
+            return response(["message_id" => $message_id, "receiver" => $receiver], 200);
+        }
+        return response(["message" => $response->message()], $response->code());
     }
 }

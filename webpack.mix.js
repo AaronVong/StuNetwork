@@ -11,7 +11,7 @@ const mix = require("laravel-mix");
  |
  */
 mix.js("resources/js/app.js", "public/js")
-    .vue({ version: 3, publicPath: process.env.PUBLIC_PATH })
+    .vue({ version: 3, publicPath: process.env.MIX_PUBLIC_PATH })
     .postCss("resources/css/app.css", "public/css", [require("tailwindcss")]);
 // .webpackConfig({
 //     resolve: {

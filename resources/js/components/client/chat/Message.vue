@@ -24,7 +24,28 @@
                 >
                     AV
                 </div> -->
+                <i
+                    v-if="this.messagePackage.deleted"
+                    :class="`
+                        inline-block
+                        message
+                        grow-1
+                        shrink-1
+                        order-${this.isSender ? '1' : '2'}
+                        inline-block
+                        text-gray-400
+                        bg-gray-100
+                        rounded-xl
+                        max-w-sm
+                        md:max-w-md
+                        break-word
+                        truncate
+                        p-2`"
+                >
+                    {{ this.messagePackage.message }}
+                </i>
                 <span
+                    v-else
                     @mouseover="this.showFullMessage"
                     @mouseout="this.showLessMessage"
                     :class="`
@@ -56,11 +77,20 @@
                 </span>
                 <i class="text-gray-500 order-2">{{ this.diffForHumans }} </i>
                 <button
+                    @click="this.handleDeleteMessage"
                     type="button"
-                    v-if="this.visible"
-                    :class="`order-${this.isSender ? '1' : '3'}`"
+                    v-if="
+                        this.visible &&
+                        this.chatUser.id == this.messagePackage.sender_id &&
+                        !this.messagePackage.deleted
+                    "
+                    :class="`order-${this.isSender ? '1' : '3'}
+                        text-center
+                        focus:outline-none
+                        hover:text-red-500
+                        cursor-pointer`"
                 >
-                    ...
+                    <i class="far fa-trash-alt mr-2"></i>
                 </button>
             </div>
         </div>
@@ -89,9 +119,10 @@ export default {
     },
     watch: {},
     computed: {
-        ...mapGetters(["chatUser"]),
+        ...mapGetters(["chatUser", "userChatWith", "chatErrorMessage"]),
     },
     methods: {
+        ...mapActions(["deleteMessageAction"]),
         showFullMessage(e) {
             $(e.target).removeClass("truncate");
             $(e.target).addClass("overflow-auto");
@@ -99,6 +130,19 @@ export default {
         showLessMessage(e) {
             $(e.target).addClass("truncate");
             $(e.target).removeClass("overflow-auto");
+        },
+        async handleDeleteMessage(e) {
+            e.preventDefault();
+            const ok = await this.deleteMessageAction({
+                message_id: this.messagePackage.id,
+                receiver_id: this.userChatWith.user_id,
+            });
+            if (!ok) {
+                this.$message({
+                    type: "error",
+                    message: this.chatErrorMessage,
+                });
+            }
         },
     },
     emits: ["toBottom"],

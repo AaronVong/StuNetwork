@@ -25,6 +25,7 @@ import {
     ElTabPane,
     ElTabs,
     ElInfiniteScroll,
+    ElNotification,
 } from "element-plus";
 import "../scss/element-variables.scss";
 import "../scss/heart_animation.scss";
@@ -62,6 +63,31 @@ const app = createApp({
         "chat-list": ChatList,
         "chat-app": Chat,
     },
+    async mounted() {
+        const user = async () => {
+            try {
+                const response = await axios.get("/get-user");
+                const user = response.data.user;
+                Echo.private(`stunetwork-chanel_${user.id}`).listenForWhisper(
+                    "sent",
+                    (e) => {
+                        this.$notify({
+                            type: "info",
+                            message: e.message,
+                            title: `${e.user.username} nhắn cho bạn`,
+                        });
+                    }
+                );
+            } catch (error) {
+                return null;
+            }
+        };
+        const regex = new RegExp("^(/chat).*$", "i");
+        const result = regex.test(window.location.pathname);
+        if (!result) {
+            await user();
+        }
+    },
 });
 
 app.use(ElUpload);
@@ -77,6 +103,7 @@ app.use(ElMessageBox);
 app.use(ElTabPane);
 app.use(ElTabs);
 app.use(ElInfiniteScroll);
+app.use(ElNotification);
 app.use(store);
 app.mount("#app");
 

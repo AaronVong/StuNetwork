@@ -52,6 +52,7 @@ Route::get('/reset-password/{token}',[UserController::class, "resetPasswordForm"
 Route::post("/reset-password",[UserController::class, "resetPassword"])->name("password.update");
 
 Route::middleware(["verified", "auth"])->group(function(){
+    Route::get("/get-user", [UserController::class, "getUser"]);
     Route::get("/", [HomeController::class, "index"])->name("home");
     Route::get("/profile/{user:username}", [ProfileController::class, "index"])->name("profile");
     Route::get("/profile/get/{user:username}", [ProfileController::class, "getProfile"])->name("profile.get");
@@ -78,7 +79,8 @@ Route::middleware(["verified", "auth"])->group(function(){
 
     Route::get("/chat", [MessageController::class, "index"])->name("chat");
     Route::get("/messages/{receiver_id}", [MessageController::class, "fetchMessages"])->name("chat.fetch");
-     Route::post("/messages/{receiver_id}", [MessageController::class, "sendMessage"])->name("chat.send");
+    Route::post("/messages/{receiver_id}", [MessageController::class, "sendMessage"])->name("chat.send");
+    Route::delete("/messages/{receiver_id}/{message_id}", [MessageController::class, "deleteMessage"])->name("chat.delette");
     # Route::get("/messages", [MessageController::class, "fetchMessages"])->name("chat.fetch");
     # Route::post("/messages", [MessageController::class, "sendMessage"])->name("chat.send");
    

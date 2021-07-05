@@ -130,6 +130,7 @@ export default {
             "setUser",
             "setMessagePage",
             "resetMessages",
+            "deleteMessagesSuccess",
         ]),
         ...mapActions(["fetchMessagesAction"]),
         scrollToBottom() {
@@ -144,12 +145,29 @@ export default {
         // nghe chanel của mình
         Echo.private(`stunetwork-chanel_${this.user.id}`)
             .listenForWhisper("typing", (e) => {
+                if (!this.userChatWith) return;
                 if (e.user.id == this.userChatWith.user_id) {
                     this.typing = e.typing;
                     this.typingUser = e.user;
                 }
             })
+            .listenForWhisper("sent", (e) => {
+                if (this.userChatWith) {
+                    if (this.userChatWith.user_id == e.user.id) return;
+                }
+                this.$notify({
+                    type: "info",
+                    message: e.message,
+                    title: `${e.user.username} nhắn cho bạn`,
+                });
+            })
+            .listenForWhisper("delete-message", (e) => {
+                if (this.userChatWith.user_id == e.sender.id) {
+                    this.deleteMessagesSuccess({ message_id: e.message_id });
+                }
+            })
             .listen("MessageSent", (event) => {
+                if (!this.userChatWith) return;
                 if (event.message.sender_id == this.userChatWith.user_id) {
                     this.pushMessage(event.message);
                     this.typing = false;
@@ -157,6 +175,7 @@ export default {
             });
     },
     updated() {
+        console.log(this.showOldMessage);
         if (!this.showOldMessage) {
             this.scrollToBottom();
         }

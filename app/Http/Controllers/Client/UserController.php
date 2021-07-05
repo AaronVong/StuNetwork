@@ -102,4 +102,8 @@ class UserController extends Controller
         }
         return response(["message" => "Không tìm thấy người dùng"],404);
     }
+
+    public function getUser(){
+        return response(["user" => auth()->user()], 200);
+    }
 }

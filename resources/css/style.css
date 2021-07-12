@@ -171,6 +171,32 @@ html {
 
 /*
 |--------------------------------------------------------------------------
-| Chat App
+| Admin
 |--------------------------------------------------------------------------
 */
+#admin-layout {
+    display: grid;
+    grid-template-columns: auto 1fr;
+}
+
+.tooltip {
+    display: none;
+    left: 120%;
+    transform: translateY(-50%);
+    padding: 0.25rem 1rem;
+}
+
+.tooltip::before {
+    content: "";
+    position: absolute;
+    left: -5%;
+    top: 30%;
+    transform: rotate(45deg);
+    background-color: #e5e7eb;
+    width: 15px;
+    height: 15px;
+}
+
+#admin-nav ul li div:hover .tooltip {
+    display: block;
+}

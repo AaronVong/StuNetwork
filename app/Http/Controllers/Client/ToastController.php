@@ -106,6 +106,10 @@ class ToastController extends Controller
         if(!$request->ajax()){
             throw new HttpException(404);
         }
+        $canUploadToast = Gate::inspect('canUploadToast',$request->user());
+        if($canUploadToast->denied()){
+            return response(["message" => $canUploadToast->message()],$canUploadToast->code());
+        }
         $validator = Validator::make($request->all(), $this->rules, $this->messages);
         
         if($validator->fails()){
@@ -119,7 +123,8 @@ class ToastController extends Controller
             return response(["message" => "Không thể tạo toast!"], 500);
         }
         # Upload file lên Drive, đồng thời lưu trữ thông tin file vào CSDL
-        if($request->hasFile("files_upload")){
+        $canUploadFiles = Gate::inspect('canUploadFiles', $request->user());
+        if($request->hasFile("files_upload") && $canUploadFiles->allowed()){
             $fileArray = $request->file("files_upload");
             foreach ($fileArray as $key => $file) {
                 $folderID = env("GOOGLE_DRIVE_TOAST_FILES_FOLDER_ID");
@@ -137,13 +142,17 @@ class ToastController extends Controller
             }
         }
         # Trả về toast vừa tạo
-        return response(["message"=>"Toast đã được đăng","createdToast" => $this->getToastById($toast->id)->first()],200);
+        return response(["message"=>$canUploadFiles->allowed() ? "Toast đã được đăng" : $canUploadFiles->message() ,"createdToast" => $this->getToastById($toast->id)->first()],200);
     }
 
     # Xóa toast
     public function destroy(Request $request, $id){
         if(!$request->ajax()){
             throw new HttpException(404);
+        }
+        $canDeleteToast = Gate::inspect('canDeleteToast', $request->user());
+        if($canDeleteToast->denied()){
+            return response(["message" => $canDeleteToast->message()],$canDeleteToast->code());
         }
         # Tìm toast
         $toast = Toast::where("id", $id)->first();
@@ -170,6 +179,12 @@ class ToastController extends Controller
         if(!$request->ajax()){
             throw new HttpException(404);
         }
+
+        $canEditToast = Gate::inspect('canEditToast', $request->user());
+        if($canEditToast->denied()){
+            return response(["message" => $canEditToast->message()],$canEditToast->code());
+        }
+
         # Validate dữ liệu
         $validator = Validator::make($request->only("content", "files_upload"), $this->rules, $this->messages);
         
@@ -199,7 +214,8 @@ class ToastController extends Controller
         }
         $toast->content = $request->content;
         # thêm hình ảnh mới (nếu có)
-        if($request->hasFile("files_upload")){
+        $canUploadFiles = Gate::inspect('canUploadFiles', $request->user());
+        if($request->hasFile("files_upload") && $canUploadFiles->allowed()){
             $fileArray = $request->file("files_upload");
             foreach ($fileArray as $key => $file) {
                 $result = $this->uploadFile($file, $folderID);
@@ -215,7 +231,7 @@ class ToastController extends Controller
             }
         }
         $toast->save();
-        return response(["message"=>"Toast đã được cập nhật","updatedToast" => $this->getToastById($toast->id)->first()],200);
+        return response(["message"=>$canUploadFiles->allowed() ? "Cập nhật toast thành công" : $canUploadFiles->message() ,"updatedToast" => $this->getToastById($toast->id)->first()],200);
     }
 
     public function like(Request $request){

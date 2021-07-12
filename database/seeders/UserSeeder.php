@@ -2,10 +2,12 @@
 
 namespace Database\Seeders;
 
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Spatie\Permission\Models\Role;
 
 class UserSeeder extends Seeder
 {
@@ -34,7 +36,14 @@ class UserSeeder extends Seeder
             "password" => Hash::make("vongquyenminh"),
             "email_verified_at" => Carbon::now()->toDateTimeString(),
         ];
+        $userRole = Role::findByName("user");
+        $userPermissions = $userRole->permissions()->get();
         DB::table("users")->insert([$user1, $user2, $user3]);
+        $admin = User::find(1);
+        $admin->assignRole(["super-admin"]);
+        $admin->givePermissionTo($userPermissions);
+        User::find(2)->givePermissionTo($userPermissions);
+        User::find(3)->givePermissionTo($userPermissions);
         $user1Profile = [
             "user_id" => 1,
             "fullname" => "Vòng Quyền Minh"
@@ -48,10 +57,5 @@ class UserSeeder extends Seeder
             "user_id" => 3,
         ];
         DB::table("profiles")->insert([$user1Profile, $user2Profile, $user3Profile]);
-        DB::table("role_user")->insert([
-            ["user_id" => 1, "role_id" => 1],
-            ["user_id" => 2, "role_id" => 1],
-            ["user_id" => 3, "role_id" => 1],
-        ]);
     }
 }

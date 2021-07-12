@@ -193,9 +193,36 @@ html {
 
 /*
 |--------------------------------------------------------------------------
-| Chat App
+| Admin
 |--------------------------------------------------------------------------
 */
+
+#admin-layout {
+  display: grid;
+  grid-template-columns: auto 1fr;
+}
+
+.tooltip {
+  display: none;
+  left: 120%;
+  transform: translateY(-50%);
+  padding: 0.25rem 1rem;
+}
+
+.tooltip::before {
+  content: "";
+  position: absolute;
+  left: -5%;
+  top: 30%;
+  transform: rotate(45deg);
+  background-color: #e5e7eb;
+  width: 15px;
+  height: 15px;
+}
+
+#admin-nav ul li div:hover .tooltip {
+  display: block;
+}
 
 /*! tailwindcss v2.2.4 | MIT License | https://tailwindcss.com */
 
@@ -31974,6 +32001,18 @@ video {
   transition-duration: 150ms;
 }
 
+.transition-width {
+  transition-property: width;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+.transition-height {
+  transition-property: height;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
 .delay-75 {
   transition-delay: 75ms;
 }
@@ -63132,6 +63171,18 @@ video {
 
   .sm\:transition-transform {
     transition-property: transform;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 150ms;
+  }
+
+  .sm\:transition-width {
+    transition-property: width;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 150ms;
+  }
+
+  .sm\:transition-height {
+    transition-property: height;
     transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
     transition-duration: 150ms;
   }
@@ -94299,6 +94350,18 @@ video {
     transition-duration: 150ms;
   }
 
+  .md\:transition-width {
+    transition-property: width;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 150ms;
+  }
+
+  .md\:transition-height {
+    transition-property: height;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 150ms;
+  }
+
   .md\:delay-75 {
     transition-delay: 75ms;
   }
@@ -125458,6 +125521,18 @@ video {
 
   .lg\:transition-transform {
     transition-property: transform;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 150ms;
+  }
+
+  .lg\:transition-width {
+    transition-property: width;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 150ms;
+  }
+
+  .lg\:transition-height {
+    transition-property: height;
     transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
     transition-duration: 150ms;
   }
@@ -156625,6 +156700,18 @@ video {
     transition-duration: 150ms;
   }
 
+  .xl\:transition-width {
+    transition-property: width;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 150ms;
+  }
+
+  .xl\:transition-height {
+    transition-property: height;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 150ms;
+  }
+
   .xl\:delay-75 {
     transition-delay: 75ms;
   }
@@ -187784,6 +187871,18 @@ video {
 
   .\32xl\:transition-transform {
     transition-property: transform;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 150ms;
+  }
+
+  .\32xl\:transition-width {
+    transition-property: width;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 150ms;
+  }
+
+  .\32xl\:transition-height {
+    transition-property: height;
     transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
     transition-duration: 150ms;
   }

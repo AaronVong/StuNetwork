@@ -72,9 +72,13 @@ const toast = {
         },
         toggleFollowSucces(state, payload) {
             state.followed = payload.followed;
-            state.followings = state.followings.filter(
-                (item) => item.id != payload.profileId
-            );
+            if (!payload.followed) {
+                state.followings = state.followings.filter(
+                    (item) => item.id != payload.profile.id
+                );
+            } else {
+                state.followings.push(payload.profile);
+            }
         },
         setFollowState(state, payload) {
             state.followed = payload;

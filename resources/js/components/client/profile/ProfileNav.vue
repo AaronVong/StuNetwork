@@ -87,19 +87,6 @@ export default {
                 await this.getProfilesFollowedByUserId(this.user_id);
                 console.log("profile nav");
             }
-            // switch (tab.props.name) {
-            //     case "toasted":
-            //         await this.getToastListUploadedByUserId(this.user_id);
-            //         break;
-            //     case "liked":
-            //         await this.getToastListLikedByUserId(this.user_id);
-            //         break;
-            //     case "followings":
-            //         await this.getProfilesFollowedByUserId(this.user_id);
-            //         break;
-            //     default:
-            //         break;
-            // }
             this.loading = false;
         },
     },

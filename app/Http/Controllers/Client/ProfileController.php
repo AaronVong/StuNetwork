@@ -117,7 +117,7 @@ class ProfileController extends Controller
     }
 
     public function follow(Request $request){
-        $profile = Profile::find($request->profile_id);
+        $profile = Profile::with("user:id,username")->where("id", $request->profile_id)->first();
         if($profile){
             $response = Gate::inspect("follow", $profile);
             if($response->allowed()){
@@ -130,7 +130,7 @@ class ProfileController extends Controller
                     $request->user()->followings()->attach($request->profile_id);
                     $isFollowed = true;
                 }
-                return response(["followed" => $isFollowed, "profileId" => $request->profile_id],200);
+                return response(["followed" => $isFollowed, "profile" => $profile],200);
             }else{
                 return response(["message" => $response->message()], 403);
             }

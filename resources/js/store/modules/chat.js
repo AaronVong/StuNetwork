@@ -93,6 +93,10 @@ export default {
             });
         },
         changeChatWith(state, payload) {
+            if (payload == null) {
+                state.chatWith = null;
+                return;
+            }
             state.chatWith = { ...payload };
         },
         pushMessage(state, payload) {

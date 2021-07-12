@@ -7,13 +7,17 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\CanResetPassword;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 use Laravelista\Comments\Commenter;
 use Overtrue\LaravelLike\Traits\Liker;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
 {
-    use HasFactory, Notifiable, Liker, Commenter;
+    use HasFactory, Notifiable, Liker, Commenter, HasRoles;
     /**
      * The attributes that are mass assignable.
      *
@@ -54,9 +58,9 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
         return $this->hasOne(Profile::class,"user_id","id");
     }
 
-    function roles(){
-        return $this->belongsToMany(Role::class);
-    }
+    // function roles(){
+    //     return $this->belongsToMany(Role::class);
+    // }
 
     public function toasts(){
         return $this->hasMany(Toast::class,"user_id", "id");
@@ -72,6 +76,16 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
 
     public function messages(){
         return $this->hasMany(Message::class,"sender_id", "id");
+    }
+
+    public function rolesWithPermissions(){
+            return $this->morphToMany(
+            config('permission.models.role'),
+            'model',
+            config('permission.table_names.model_has_roles'),
+            config('permission.column_names.model_morph_key'),
+            'role_id'
+        )->with("permissions");
     }
     /**
      * 

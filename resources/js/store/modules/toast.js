@@ -5,8 +5,8 @@ export default {
             toastList: [],
             page: 1,
             validates: {},
-            errorMessage: "",
-            infoMessage: "",
+            errorMessage: null,
+            infoMessage: null,
         };
     },
     actions: {
@@ -168,6 +168,7 @@ export default {
             const result = regex.test(window.location.pathname);
             if (!result) {
                 state.toastList.unshift(payload.createdToast);
+                state.infoMessage = payload.message;
             }
         },
         // Thêm mới toast thất bại
@@ -190,9 +191,8 @@ export default {
                         };
                     }
                 }
-            }
-            if (payload.status == 500) {
-                state.message = payload.data.message;
+            } else {
+                state.errorMessage = payload.data.message;
             }
         },
         // xóa toast thành công

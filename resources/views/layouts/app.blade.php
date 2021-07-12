@@ -11,11 +11,11 @@
             <!-- Web Contents Here -->
             @yield("center")
         </div>
-        <div id="sidebar" class="relative hidden md:gird-cols-1 lg:block">
-            <div class="w-full">
-            <!-- Web Side Bar Here -->
-                <h1 class="text-center"> right</h1>
+        <div class="relative w-full justify-center md:gird-cols-1 hidden lg:flex">
+            <div class="w-full p-3">
+             <!-- Web Side Bar Here -->
+               <search :user="{{auth()->user()}}" :followings="{{ auth()->user()->followings}}"></search>
             </div>
-        </div>   
+        </div>
     </div>
 @endsection

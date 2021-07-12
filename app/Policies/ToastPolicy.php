@@ -22,14 +22,14 @@ class ToastPolicy
     }
 
     public function delete(User $deleter, Toast $toast){
-        return $deleter->id === $toast->user_id ? Response::allow() : Response::deny("Bạn không có quyền xóa toast này!");
+        return $deleter->id === $toast->user_id ? Response::allow('',200) : Response::deny("Bạn không có quyền xóa toast này!",403);
     }
 
     public function owned(User $actor, Toast $toast){
-        return $actor->id === $toast->user_id ? Response::allow() : Response::deny("Bạn không sở hữu toast này!");
+        return $actor->id === $toast->user_id ? Response::allow('',200) : Response::deny("Bạn không sở hữu toast này!",403);
     }
 
     public function update(User $actor, Toast $toast){
-        return $actor->id === $toast->user_id ? Response::allow() : Response::deny("Bạn không có quyền cập nhật toast này!");
+        return $actor->id === $toast->user_id ? Response::allow('',200) : Response::deny("Bạn không có quyền cập nhật toast này!",403);
     }
 }

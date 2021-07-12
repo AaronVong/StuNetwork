@@ -1,22 +1,6 @@
 <template>
     <div class="w-full flex">
-        <button
-            class="
-                ml-auto
-                mt-2
-                p-2
-                bg-white
-                rounded-full
-                border border-blue-400
-                text-blue-400
-                font-medium
-                hover:bg-blue-100
-                transition-colors
-                duration-200
-                focus:outline-none
-            "
-            v-on:click="this.toggleEditProfile"
-        >
+        <button :class="this.buttonClass" v-on:click="this.toggleEditProfile">
             Chỉnh sửa Profile
         </button>
     </div>
@@ -242,7 +226,9 @@
                         bg-blue-500
                         hover:bg-blue-600
                         focus:outline-none
-                        focus:ring focus:ring-1 focus:ring-blue-400
+                        focus:ring
+                        focus:ring-1
+                        focus:ring-blue-400
                         text-gray-200 text-lg
                     "
                 >
@@ -283,6 +269,11 @@ export default {
         username: {
             type: String,
             default: "",
+        },
+        buttonClass: {
+            type: String,
+            default:
+                "ml-auto mt-2 p-2 bg-white rounded-full border border-blue-400 text-blue-400 font-medium hover:bg-blue-100 transition-colors duration-200 focus:outline-none",
         },
     },
     methods: {

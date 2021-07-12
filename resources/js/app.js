@@ -26,6 +26,9 @@ import {
     ElTabs,
     ElInfiniteScroll,
     ElNotification,
+    ElTooltip,
+    ElTable,
+    ElTableColumn,
 } from "element-plus";
 import "../scss/element-variables.scss";
 import "../scss/heart_animation.scss";
@@ -47,6 +50,13 @@ import Toast from "./components/client/toast/Toast";
 import Comments from "./components/client/comment/Comments";
 import ChatList from "./components/client/chat/ChatList";
 import Chat from "./components/client/chat/Chat";
+import AdminNav from "./components/admin/AdminNav";
+import AdminInfo from "./components/admin/AdminInfo";
+import MemberList from "./components/admin/MemberList";
+import ListUsers from "./components/admin/ListUsers";
+import ListToasts from "./components/admin/ListToasts";
+import UserDetail from "./components/admin/UserDetail";
+import Search from "./components/client/search/Search";
 const app = createApp({
     components: {
         "register-form": RegisterForm,
@@ -62,6 +72,13 @@ const app = createApp({
         "toast-comments": Comments,
         "chat-list": ChatList,
         "chat-app": Chat,
+        "admin-nav": AdminNav,
+        "admin-info": AdminInfo,
+        "member-list": MemberList,
+        "list-users": ListUsers,
+        "user-detail": UserDetail,
+        "list-toasts": ListToasts,
+        search: Search,
     },
     async mounted() {
         const user = async () => {
@@ -104,6 +121,9 @@ app.use(ElTabPane);
 app.use(ElTabs);
 app.use(ElInfiniteScroll);
 app.use(ElNotification);
+app.use(ElTooltip);
+app.use(ElTable);
+app.use(ElTableColumn);
 app.use(store);
 app.mount("#app");
 

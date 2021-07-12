@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
@@ -37,7 +38,11 @@ class LoginController extends Controller
             return response(["validates" => $validator->errors()], 422);
         }
         if(Auth::attempt($req->only(["email", "password"]), $req->remember) !== false){
-            return response(["next" => route("home")],200);
+            if(!auth()->user()->hasPermissionTo('login')){
+                Auth::logout();
+                return response(["message" => "Tài khoản của bạn đã bị khóa, email minh.vongquyen@student.stu.edu.vn để biết thêm chi tiết"], 403);
+            }
+            return auth()->user()->hasRole('super-admin') ? response(["next" => route("dashboard")],200):  response(["next" => route("home")],200);
         }
         return response(["message" => "Email hoặc mật khẩu không đúng!"], 406);
     }

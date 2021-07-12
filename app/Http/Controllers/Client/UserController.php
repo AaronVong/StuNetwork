@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
 use Illuminate\Auth\Events\PasswordReset;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -95,6 +96,7 @@ class UserController extends Controller
     }
 
     public function profilesFollowedById(Request $request){
+        # need fix 
         $user = User::find($request->id);
         if($user){
             $followings = DB::table("profiles")->join("users", "users.id", "=","profiles.user_id")->join("user_follows", "user_follows.following_id", "=","profiles.id")->where("user_follows.follower_id","=",$request->id)->select("profiles.*","users.username")->get();
@@ -105,5 +107,15 @@ class UserController extends Controller
 
     public function getUser(){
         return response(["user" => auth()->user()], 200);
+    }
+
+
+    public function searchUserbyUsername(Request $request, $username){
+        $users = User::with(["profile:user_id,id,fullname,avatarUrl"])->withCount(["profile as followed" => function(Builder $query){
+            $query->whereHas("followers", function($follower){
+                $follower->where("follower_id", auth()->user()->id);
+            });
+        }])->where([["username",'like' ,'%'.$username.'%']])->get();
+        return response(["users" => $users],200);
     }
 }

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\VerificationController;
@@ -9,6 +10,7 @@ use App\Http\Controllers\Client\ToastCommentController;
 use App\Http\Controllers\Client\ToastController;
 use App\Http\Controllers\Client\UserController;
 use App\Http\Controllers\Client\MessageController;
+use App\Models\User;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Route;
 
@@ -43,7 +45,20 @@ Route::post('/email/verification-notification', [VerificationController::class, 
 
 /*
 |--------------------------------------------------------------------------
-| Client Page Route
+| Admin Route
+|--------------------------------------------------------------------------
+*/
+Route::middleware(["verified", "auth", "role:super-admin"])->group(function(){
+    Route::get("/dashboard", [AdminController::class,"index"])->name("dashboard");
+    Route::get("/list-users", [AdminController::class, "getListUsers"]);
+    Route::get("/list-users/{user:username}", [AdminController::class, "userDetail"]);
+    Route::post("/list-users/{user:username}/loginpermission", [AdminController::class, "loginPermission"]);
+    Route::post("/list-users/{user:username}/edit",[AdminController::class, "editUserAccount"]);
+    Route::get("/list-toasts", [AdminController::class, "getListToasts"]);
+});
+/*
+|--------------------------------------------------------------------------
+| Client Route
 |--------------------------------------------------------------------------
 */
 Route::get("/forgot-password", [UserController::class, "forgotPasswordForm"])->name("password.request");
@@ -52,6 +67,7 @@ Route::get('/reset-password/{token}',[UserController::class, "resetPasswordForm"
 Route::post("/reset-password",[UserController::class, "resetPassword"])->name("password.update");
 
 Route::middleware(["verified", "auth"])->group(function(){
+    Route::get("/search/{user:username}",[UserController::class, "searchUserbyUsername"]);
     Route::get("/get-user", [UserController::class, "getUser"]);
     Route::get("/", [HomeController::class, "index"])->name("home");
     Route::get("/profile/{user:username}", [ProfileController::class, "index"])->name("profile");

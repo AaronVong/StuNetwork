@@ -70,9 +70,9 @@ export default {
     mutations: {
         chatActionFail(state, payload) {
             if (payload.status == 422) {
-                state.validates = { ...payload.validates };
+                state.validates = { ...payload.data.validates };
             } else {
-                state.errorMessage = payload.errorMessage;
+                state.errorMessage = payload.data.message;
             }
         },
         sendMessagesSuccess(state, payload) {

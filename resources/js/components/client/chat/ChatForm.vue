@@ -76,6 +76,11 @@ export default {
                     sent: true,
                     message: this.form.message,
                 });
+            } else {
+                this.$message({
+                    type: "error",
+                    message: this.chatErrorMessage,
+                });
             }
             this.form.message = "";
         },

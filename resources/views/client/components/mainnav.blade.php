@@ -23,11 +23,8 @@
                 <span class="hidden lg:inline-block lg:text-base xl:text-xl lg:w-4/6">Hồ sơ</span>
             </a>
         </li>
-        <li class="pill relative mb-3 w-full h-12 cursor-pointer" >
-            <div class="flex justify-evenly items-center w-full h-full pill-hover font-medium text-2xl text-gray-700">
-                <i class="fas fa-search"></i>
-                <span class="hidden lg:inline-block lg:text-base xl:text-xl lg:w-4/6">Tìm kiếm</span>
-            </div>
+        <li class="pill relative mb-3 w-full h-12" >
+            <nav-search :user="{{auth()->user()}}"></nav-search>
         </li>
         <li class="pill relative mb-3 w-full h-12">
             <a href="{{ route('home') }}" class=" flex justify-evenly items-center w-full h-full pill-hover font-medium text-2xl text-gray-700">

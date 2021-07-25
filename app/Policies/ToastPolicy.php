@@ -22,7 +22,7 @@ class ToastPolicy
     }
 
     public function delete(User $deleter, Toast $toast){
-        return $deleter->id === $toast->user_id ? Response::allow('',200) : Response::deny("Bạn không có quyền xóa toast này!",403);
+        return $deleter->id === $toast->user_id || $deleter->hasRole('super-admin') ? Response::allow('',200) : Response::deny("Bạn không có quyền xóa toast này!",403);
     }
 
     public function owned(User $actor, Toast $toast){

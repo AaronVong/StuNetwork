@@ -3,6 +3,7 @@
         v-infinite-scroll="load"
         infinite-scroll-immediate="false"
         infinite-scroll-disabled="disabledInfiniteScroll"
+        infinite-scroll-distance="10"
         class="w-full h-96 p-3 overflow-y-auto"
     >
         <table
@@ -79,15 +80,21 @@
                             {{ toast.content }}
                         </p>
                     </td>
-                    <td class="border-2 border-gray-300 border-collapse p-3">
+                    <td
+                        class="
+                            border-2 border-gray-300 border-collapse
+                            p-3
+                            h-auto
+                        "
+                    >
                         <div
-                            :class="`w-24 h-24 grid gird-row-auto grid-cols-1 gap-2 items-center min-h-full`"
+                            v-for="(file, index) in toast.files"
+                            :key="index"
+                            :class="`w-24 h-24 flex flex-wrap gap-2 items-center min-h-full`"
                         >
                             <!-- Toast files place here -->
                             <img
                                 class="max-w-full max-h-full"
-                                v-for="(file, index) in toast.files"
-                                :key="index"
                                 :src="file.url"
                                 :alt="file.name"
                             />
@@ -101,7 +108,7 @@
                     </td>
                     <td class="border-2 border-gray-300 border-collapse p-3">
                         <form
-                            @submit="this.handleSubmit($event, toastID)"
+                            @submit="this.deleteToast($event, toast.id)"
                             class="inline-block"
                         >
                             <button
@@ -177,8 +184,22 @@ export default {
         },
     },
     methods: {
-        ...mapActions(["loginPermission"]),
-        handleSubmit(e, toastID) {},
+        ...mapActions(["loginPermission", "deleteToastAction"]),
+        async deleteToast(event, toastID) {
+            event.preventDefault();
+            if (!toastID) {
+                return;
+            }
+            const ok = await this.deleteToastAction(toastID);
+            if (ok) {
+                alert("Toast đã được xóa");
+                this.localToasts = this.localToasts.filter(
+                    (toast) => toast.id != toastID
+                );
+            } else {
+                alert("Xảy ra lỗi, xem console");
+            }
+        },
         async load() {
             this.loading = true;
             try {

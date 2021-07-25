@@ -37,7 +37,9 @@
                     mb-3
                     text-md
                     focus:outline-none
-                    focus:ring focus:ring-1 focus:ring-blue-400
+                    focus:ring
+                    focus:ring-1
+                    focus:ring-blue-400
                 "
                 type="text"
                 id="fullname"
@@ -63,7 +65,9 @@
                     mb-3
                     text-md
                     focus:outline-none
-                    focus:ring focus:ring-1 focus:ring-blue-400
+                    focus:ring
+                    focus:ring-1
+                    focus:ring-blue-400
                 "
                 type="text"
                 id="username"
@@ -89,7 +93,9 @@
                     mb-3
                     text-md
                     focus:outline-none
-                    focus:ring focus:ring-1 focus:ring-blue-400
+                    focus:ring
+                    focus:ring-1
+                    focus:ring-blue-400
                 "
                 type="text"
                 id="email"
@@ -117,7 +123,9 @@
                     mb-3
                     text-md
                     focus:outline-none
-                    focus:ring focus:ring-1 focus:ring-blue-400
+                    focus:ring
+                    focus:ring-1
+                    focus:ring-blue-400
                 "
                 type="password"
                 id="password"
@@ -145,7 +153,9 @@
                     mb-3
                     text-md
                     focus:outline-none
-                    focus:ring focus:ring-1 focus:ring-blue-400
+                    focus:ring
+                    focus:ring-1
+                    focus:ring-blue-400
                 "
                 type="password"
                 id="password_confirmation"
@@ -171,7 +181,9 @@
                     bg-blue-500
                     hover:bg-blue-600
                     focus:outline-none
-                    focus:ring focus:ring-1 focus:ring-blue-400
+                    focus:ring
+                    focus:ring-1
+                    focus:ring-blue-400
                     text-gray-200
                 "
             >
@@ -231,6 +243,10 @@ export default {
             e.preventDefault();
             this.loading = true;
             await this.register({ formData: this.form });
+            if (!this.authErrorMessage) {
+                this.form.password = "";
+                this.form.password_confirmation = "";
+            }
             this.loading = false;
         },
     },

@@ -50,6 +50,7 @@ export default {
             state.infoMessage = payload.message;
         },
         editUserAccountSuccess(state, payload) {
+            alert(payload.message);
             window.location.reload();
         },
     },

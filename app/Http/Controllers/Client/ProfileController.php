@@ -67,6 +67,10 @@ class ProfileController extends Controller
         if(!$req->ajax()){
             return response(["message" => "Không hộ trợ phương thúc"], 400);
         }
+        $canEditProfile = Gate::inspect("canEditProfile", $req->user());
+        if($canEditProfile->denied()){
+            return response(["message" => $canEditProfile->message()], $canEditProfile->code());
+        }
         # Tìm profile
         $user = User::where("username", $username)->first();
         # Profile không tồn tại ?

@@ -11,13 +11,14 @@
             <!-- Web Contents Here -->
             <chat-app v-bind:user="{{ auth()->user() }}"></chat-app>
         </div>
-        <div class="relative w-full justify-center md:gird-cols-1 hidden lg:flex">
+        <chat-list v-bind:chat_list="{{ auth()->user()->followings }}"></chat-list>
+        <!-- <div class="relative w-full h-full justify-center hidden xl:col-span-1 xl:block">
             <div class="w-full p-3">
-             <!-- Web Side Bar Here -->
-               <search :user="{{auth()->user()}}"></search>
+                <div class="sticky top-2">
+                   <search :user="{{auth()->user()}}" :followings="{{ auth()->user()->followings}}"></search>
+               </div>
                <chat-list v-bind:chat_list="{{ auth()->user()->followings }}"></chat-list>
             </div>
-        </div>
-        
+        </div> -->
     </div>
 @endsection

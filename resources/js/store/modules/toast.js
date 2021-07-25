@@ -6,7 +6,7 @@ export default {
             page: 1,
             validates: {},
             errorMessage: null,
-            infoMessage: null,
+            infoMessage: "",
         };
     },
     actions: {
@@ -47,7 +47,6 @@ export default {
                 const response = await axios.delete(`/toast/${id}`);
                 if (response.status == 200) {
                     commit("deleteToastSuccess", response.data);
-                    commit("toastActionSuccess", response.data);
                     return true;
                 }
             } catch (error) {
@@ -199,6 +198,7 @@ export default {
         deleteToastSuccess(state, payload) {
             const regex = new RegExp("^(/toast)/[0-9]+$", "i");
             const result = regex.test(window.location.pathname);
+            state.infoMessage = payload.message;
             if (result) {
                 window.location.replace("/");
                 return;

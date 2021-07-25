@@ -76,6 +76,6 @@ class AdminController extends Controller
                $user->revokePermissionTo($key);
            }
        }
-       return response(["message"=>"thành công"],200);
+       return response(["message"=>"Thay đổi đã được lưu"],200);
    }
 }

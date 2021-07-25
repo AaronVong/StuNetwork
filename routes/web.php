@@ -66,7 +66,7 @@ Route::post("/forgot-password", [UserController::class, "forgotPassword"])->name
 Route::get('/reset-password/{token}',[UserController::class, "resetPasswordForm"] )->name('password.reset');
 Route::post("/reset-password",[UserController::class, "resetPassword"])->name("password.update");
 
-Route::middleware(["verified", "auth"])->group(function(){
+Route::middleware(["verified", "auth", "permission:login"])->group(function(){
     Route::get("/search/{user:username}",[UserController::class, "searchUserbyUsername"]);
     Route::get("/get-user", [UserController::class, "getUser"]);
     Route::get("/", [HomeController::class, "index"])->name("home");

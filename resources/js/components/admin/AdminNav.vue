@@ -283,5 +283,4 @@ export default {
         });
     },
 };
-window;
 </script>

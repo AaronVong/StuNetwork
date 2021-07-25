@@ -79,13 +79,10 @@ export default {
             const name = tab.props.name;
             if (name == "toasted") {
                 await this.getToastListUploadedByUserId(this.user_id);
-                console.log("profile nav");
             } else if (name == "liked") {
                 await this.getToastListLikedByUserId(this.user_id);
-                console.log("profile nav");
             } else {
                 await this.getProfilesFollowedByUserId(this.user_id);
-                console.log("profile nav");
             }
             this.loading = false;
         },
@@ -94,7 +91,6 @@ export default {
         if (this.activeTab == "toasted") {
             await this.getToastListUploadedByUserId(this.user_id);
         }
-        console.log("mounted");
     },
 };
 </script>

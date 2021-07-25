@@ -106,24 +106,33 @@ class ToastController extends Controller
         if(!$request->ajax()){
             throw new HttpException(404);
         }
+
         $canUploadToast = Gate::inspect('canUploadToast',$request->user());
+        # Không có quyền đăng toast
         if($canUploadToast->denied()){
             return response(["message" => $canUploadToast->message()],$canUploadToast->code());
         }
+
         $validator = Validator::make($request->all(), $this->rules, $this->messages);
         
+        # Validate thất bại
         if($validator->fails()){
             return response(["validates" => $validator->errors()], 422);
         }
 
+        # Tạo toast
         $toast = $request->user()->toasts()->create([
             "content" => $request->content
         ]);
+        
+        # Tạo thất bại
         if($toast==null){
             return response(["message" => "Không thể tạo toast!"], 500);
         }
+
         # Upload file lên Drive, đồng thời lưu trữ thông tin file vào CSDL
         $canUploadFiles = Gate::inspect('canUploadFiles', $request->user());
+        # Nếu có tồn file được upload và có quyền upload file
         if($request->hasFile("files_upload") && $canUploadFiles->allowed()){
             $fileArray = $request->file("files_upload");
             foreach ($fileArray as $key => $file) {
@@ -147,28 +156,39 @@ class ToastController extends Controller
 
     # Xóa toast
     public function destroy(Request $request, $id){
+        
         if(!$request->ajax()){
             throw new HttpException(404);
         }
         $canDeleteToast = Gate::inspect('canDeleteToast', $request->user());
-        if($canDeleteToast->denied()){
-            return response(["message" => $canDeleteToast->message()],$canDeleteToast->code());
-        }
-        # Tìm toast
+        $canDeleteFile = Gate::inspect('canDeleteFile', $request->user());
         $toast = Toast::where("id", $id)->first();
+        # Không có quyền xóa toast
+        if($canDeleteToast->denied() || $canDeleteFile->denied()){
+            return response(["message" => count($toast->files) <= 0 ? "Tài khoản đã bị khóa chức năng xóa file hoặc bài viết" :$canDeleteToast->message()." - ".$canDeleteFile->message()],$canDeleteToast->allowed() ? $canDeleteFile->code() : $canDeleteToast->code());
+        } 
+        $message = ""; 
+
+        # Tìm toast
+        
         if($toast!= null){
-            # kiểm tra quyền
             $response = Gate::inspect("delete",$toast);
+            # Là chủ sở hữu của toast này
             if($response->allowed()){
                 $files = $toast->files;
                 $folderID = env("GOOGLE_DRIVE_TOAST_FILES_FOLDER_ID");
-                foreach ($files as $key => $file) {
-                    Storage::delete($folderID."/".$file->id);
+                if($canDeleteFile->denied()){
+                    $message = $canDeleteFile->message();
+                }else{
+                    foreach ($files as $key => $file) {
+                        Storage::delete($folderID."/".$file->id);
+                    }
+                    $message = "Toast đã được xóa";
                 }
                 $toast->delete();
-                return response(["message" => "Toast đã được xóa", "deletedID" => $toast->id], 200);
+                return response(["message" => $message, "deletedID" => $toast->id], 200);
             }else{
-                return response(["message"=>$response->message()], 401);
+                return response(["message"=>$response->message()], $response->code());
             }
         }
         return response(["message"=>"Toast đã bị xóa hoặc không tồn tại!"], 404);
@@ -205,13 +225,17 @@ class ToastController extends Controller
             return response(["message" => $response->message()],401);
         }
 
-        # Xóa file bị xóa
-        $deletedFiles = json_decode($request->deletedFiles); # mảng id file đã bị xóa
-        $folderID = env("GOOGLE_DRIVE_TOAST_FILES_FOLDER_ID");
-        foreach($deletedFiles as $key => $value){
-            Storage::delete($folderID."/".$value);
-            $toast->files()->where("id", "like", $value)->delete();
+        $canDeleteFile = Gate::inspect('canDeleteFile', $request->user());
+        if($canDeleteFile->allowed()){
+            # Xóa file bị xóa
+            $deletedFiles = json_decode($request->deletedFiles); # mảng id file đã bị xóa
+            $folderID = env("GOOGLE_DRIVE_TOAST_FILES_FOLDER_ID");
+            foreach($deletedFiles as $key => $value){
+                Storage::delete($folderID."/".$value);
+                $toast->files()->where("id", "like", $value)->delete();
+            }
         }
+        
         $toast->content = $request->content;
         # thêm hình ảnh mới (nếu có)
         $canUploadFiles = Gate::inspect('canUploadFiles', $request->user());

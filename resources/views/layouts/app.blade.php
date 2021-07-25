@@ -11,10 +11,11 @@
             <!-- Web Contents Here -->
             @yield("center")
         </div>
-        <div class="relative w-full justify-center md:gird-cols-1 hidden lg:flex">
+        <div class="relative w-full justify-center hidden lg:col-span-1 lg:flex">
             <div class="w-full p-3">
-             <!-- Web Side Bar Here -->
-               <search :user="{{auth()->user()}}" :followings="{{ auth()->user()->followings}}"></search>
+               <div class="sticky top-2">
+                   <search :user="{{auth()->user()}}" ></search>
+               </div>
             </div>
         </div>
     </div>

@@ -12,10 +12,8 @@
             items-center
             bg-blue-500
             justify-center
-            lg:w-full
-            lg:h-12
-            focus:outline-none
-            focus:ring-2
+            lg:w-full lg:h-12
+            focus:outline-none focus:ring-2
             hover:bg-blue-400
             transition-colors
             duration-200
@@ -26,7 +24,7 @@
     <el-dialog
         title="Quick Toast"
         width="80%"
-        v-model="quickToastVisible"
+        v-model="this.quickToastVisible"
         @closed="
             () => {
                 if (this.quickToastVisible) this.quickToastVisible = false;

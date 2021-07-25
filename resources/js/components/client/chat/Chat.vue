@@ -1,14 +1,14 @@
 <template>
-    <div v-if="this.chatErrorMessage || !this.userChatWith">
+    <div v-if="!this.userChatWith">
         <h3 v-if="!this.userChatWith" class="text-2xl text-center p-6">
             Hãy chọn cuộc trò chuyện
         </h3>
-        <h3
+        <!-- <h3
             v-else-if="this.chatErrorMessage"
             class="text-2xl text-center p-6 text-red-500"
         >
             {{ this.chatErrorMessage }}
-        </h3>
+        </h3> -->
     </div>
     <div v-else class="w-full h-full flex flex-col" v-loading="this.loading">
         <div class="w-full flex flex-col flex-grow h-80 border">
@@ -62,7 +62,7 @@
                     :isSender="message.sender_id == this.user.id"
                     v-on:toBottom="this.scrollToBottom"
                 />
-                <div v-show="this.typing" class="flex items-center px-3">
+                <div v-show="this.typings" class="flex items-center px-3">
                     <img
                         src="/images/Pulse-1s-197px.svg"
                         class="h-16 bg-transparent"
@@ -91,6 +91,7 @@ export default {
             noMore: false,
             loadMore: false,
             showOldMessage: false,
+            delayMessageLoading: null,
         };
     },
     props: {
@@ -175,7 +176,6 @@ export default {
             });
     },
     updated() {
-        console.log(this.showOldMessage);
         if (!this.showOldMessage) {
             this.scrollToBottom();
         }
@@ -186,7 +186,7 @@ export default {
             if (this.loadMore || this.noMore) {
                 return;
             }
-            if (scrollTop <= 50) {
+            if (scrollTop <= 10) {
                 this.loadMore = true;
                 this.showOldMessage = true;
                 this.noMore = await this.fetchMessagesAction(

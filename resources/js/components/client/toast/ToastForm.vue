@@ -45,7 +45,6 @@
             <div class="ml-auto">
                 <button
                     type="submit"
-                    id="toast-form__submit"
                     :class="` btn-basic
                         rounded-full
                         py-2

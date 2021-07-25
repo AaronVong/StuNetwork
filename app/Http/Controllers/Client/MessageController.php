@@ -40,6 +40,10 @@ class MessageController extends Controller
             return response(["validates" => $validator->errors()], 422);
         }
         # Check Policy
+        $canSendMessage = Gate::inspect("canSendMessage", auth()->user());
+        if($canSendMessage->denied()){
+            return response(["message" => $canSendMessage->message()], $canSendMessage->code());
+        }
         # Store to database
         try{
             $message = auth()->user()->messages()->create([
@@ -60,6 +64,12 @@ class MessageController extends Controller
         if(!$message){
             return response(["message" => "Tin nhắn không tồn tại"], 404);
         }
+        
+        $canDeleteMessage = Gate::inspect("canDeleteMessage", auth()->user());
+        if($canDeleteMessage->denied()){
+            return response(["message" => $canDeleteMessage->message()], $canDeleteMessage->code());
+        }
+
         $response = Gate::inspect("delete", $message);
         if($response->allowed()){
             $receiver= $message->receiver; 

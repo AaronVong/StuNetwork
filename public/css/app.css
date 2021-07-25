@@ -23,7 +23,7 @@ html {
 
 .pill {
   position: relative;
-  z-index: 3;
+  /* z-index: 3; */
 }
 
 .pill-hover:hover {

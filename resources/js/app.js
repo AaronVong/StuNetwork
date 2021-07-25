@@ -57,6 +57,8 @@ import ListUsers from "./components/admin/ListUsers";
 import ListToasts from "./components/admin/ListToasts";
 import UserDetail from "./components/admin/UserDetail";
 import Search from "./components/client/search/Search";
+import NavSearch from "./components/client/search/NavSearch";
+
 const app = createApp({
     components: {
         "register-form": RegisterForm,
@@ -79,6 +81,7 @@ const app = createApp({
         "user-detail": UserDetail,
         "list-toasts": ListToasts,
         search: Search,
+        "nav-search": NavSearch,
     },
     async mounted() {
         const user = async () => {
@@ -99,11 +102,12 @@ const app = createApp({
                 return null;
             }
         };
-        const regex = new RegExp("^(/chat).*$", "i");
+        const regex = new RegExp("^((/chat)|(/dashboard)).*$", "i");
         const result = regex.test(window.location.pathname);
-        if (!result) {
-            await user();
+        if (result) {
+            return;
         }
+        await user();
     },
 });
 

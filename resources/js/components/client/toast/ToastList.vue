@@ -1,5 +1,11 @@
 <template>
-    <div class="border-b">
+    <div
+        class="border-b"
+        v-infinite-scroll="loadMoreToast"
+        infinite-scroll-immediate="false"
+        infinite-scroll-disabled="disabledInfiniteScroll"
+        infinite-scroll-distance="10"
+    >
         <ul class="divide-y infinite-list-wrapper" style="overflow: auto">
             <Toast
                 v-for="(toast, index) in this.toastList"
@@ -18,7 +24,10 @@
                 class="w-full h-16 bg-transparent"
             />
         </div>
-        <div v-if="this.noMore" class="text-lg text-center py-3 font-bold">
+        <div
+            v-if="this.noMore && this.enableInfiniteScroll"
+            class="text-lg text-center py-3 font-semibold"
+        >
             Không còn toast để tải
         </div>
     </div>
@@ -31,18 +40,8 @@ export default {
         return {
             loading: false,
             noMore: false,
-            count: 0,
+            enableInfiniteScroll: true,
         };
-    },
-    methods: {
-        ...mapActions([
-            "toastListPaginateAction",
-            "getProfilesFollowedByUserId",
-            "getToastListUploadedByUserId",
-            "getToastListLikedByUserId",
-        ]),
-        ...mapMutations(["setToastList", "setPage", "setToastList"]),
-        async loadMoreToast() {},
     },
     props: {
         // user hiện hành (user đang đăng nhập)
@@ -61,6 +60,9 @@ export default {
     },
     computed: {
         ...mapGetters(["toastList", "followings"]),
+        disabledInfiniteScroll() {
+            return this.loading || this.noMore;
+        },
     },
     watch: {
         defaultAction: {
@@ -68,6 +70,28 @@ export default {
                 this.noMore = false;
             },
             immediate: true,
+        },
+    },
+    methods: {
+        ...mapActions([
+            "toastListPaginateAction",
+            "getProfilesFollowedByUserId",
+            "getToastListUploadedByUserId",
+            "getToastListLikedByUserId",
+        ]),
+        ...mapMutations(["setToastList", "setPage", "setToastList"]),
+        async loadMoreToast() {
+            this.loading = true;
+            if (this.defaultAction == "toasted") {
+                this.noMore = await this.getToastListUploadedByUserId(
+                    this.owner
+                );
+            } else if (this.defaultAction == "liked") {
+                this.noMore = await this.getToastListLikedByUserId(this.owner);
+            } else {
+                this.noMore = await this.toastListPaginateAction();
+            }
+            this.loading = false;
         },
     },
     components: { Toast },
@@ -79,38 +103,9 @@ export default {
         const result = regex.test(window.location.pathname);
         if (result) {
             // nếu đang trang chi tiết toast không chạy infinite scroll
-            return;
+            this.noMore = true;
+            this.enableInfiniteScroll = false;
         }
-        window.addEventListener("scroll", async () => {
-            const { scrollTop, scrollHeight, clientHeight } =
-                document.documentElement;
-
-            // console.log({ scrollTop, scrollHeight, clientHeight });
-
-            if (clientHeight + scrollTop >= scrollHeight - 5) {
-                if (this.noMore || this.loading || this.toastList.length == 0) {
-                    console.log("stopped");
-                    return;
-                }
-                this.loading = true;
-                if (this.defaultAction == "toasted") {
-                    this.noMore = await this.getToastListUploadedByUserId(
-                        this.owner
-                    );
-                    console.log("toast list");
-                } else if (this.defaultAction == "liked") {
-                    this.noMore = await this.getToastListLikedByUserId(
-                        this.owner
-                    );
-                    console.log("toast list");
-                } else {
-                    this.noMore = await this.toastListPaginateAction();
-                    console.log("toast list");
-                }
-                // console.log(this.noMore);
-                this.loading = false;
-            }
-        });
     },
 };
 </script>

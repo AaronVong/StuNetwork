@@ -107,6 +107,7 @@ const app = createApp({
         if (result) {
             return;
         }
+        // chỉ chạy khi trang hiện hành không phải là /chat hoặc /dashboard
         await user();
     },
 });

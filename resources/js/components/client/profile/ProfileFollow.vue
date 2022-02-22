@@ -1,5 +1,5 @@
 <template>
-    <div class="flex justify-end items-center h-full">
+    <div class="flex justify-end items-center">
         <button
             v-if="!this.followed"
             @click="this.handleFollow"

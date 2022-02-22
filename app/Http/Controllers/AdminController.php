@@ -6,6 +6,8 @@ use App\Models\Toast;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
+use Illuminate\Database\Eloquent\Builder;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class AdminController extends Controller
 {
@@ -77,5 +79,19 @@ class AdminController extends Controller
            }
        }
        return response(["message"=>"Thay đổi đã được lưu"],200);
+   }
+
+   public function toastDetail(Request $request, $username){
+        $user = User::with("profile")->where("username", $username)->first();
+        if(!$user){
+            return throw new HttpException(404);
+        }
+        $toasts = Toast::with(["user", "files"])->where("user_id",$user->id)->orderBy("id", "desc")->paginate(10);
+        return view("admin.toastdetail", ["user" => $user, "toasts" =>$toasts]);
+   }
+
+   public function userToast(Request $reuquest, $user_id){
+       $toasts = Toast::with(["user", "files"])->where("user_id",$user_id)->orderBy("id", "desc")->paginate(10);
+        return $toasts->currentPage() <= $toasts->lastPage() ? response(["toasts" => $toasts], 200) : response([],204);
    }
 }

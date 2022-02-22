@@ -29,7 +29,7 @@
         "
     >
         <div class="w-full">
-            <Search :user="this.user" />
+            <Search :user="this.user" v-on:close="this.toggleSearchPanel" />
         </div>
         <template #footer>
             <div class="flex justify-end items-center gap-4">

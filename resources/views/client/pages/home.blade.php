@@ -13,7 +13,15 @@
     </div>
     <div class="w-full">
         <!-- Toast List Here -->
-        <toast-list v-bind:owner="{{ auth()->user()->id }}" v-bind:guest="{{ auth()->user()->id }}" v-bind:toast_list="{{ json_encode($toasts) }}"></toast-list>
+        @if(count($toasts) <= 0)
+            @if(Route::currentRouteName() == 'home')
+                <h4 class="text-center text-xl font-semibold py-3">Theo dõi để xem bài viết của họ</h4>
+            @else
+                <h4 class="text-center text-xl font-semibold py-3">Chưa có Toast mới</h4>
+            @endif
+        @else
+            <toast-list v-bind:owner="{{ auth()->user()->id }}" v-bind:guest="{{ auth()->user()->id }}" v-bind:toast_list="{{ json_encode($toasts) }}"></toast-list>
+        @endif
     </div>
 </div>
 @endsection

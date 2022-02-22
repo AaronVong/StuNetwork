@@ -5,7 +5,8 @@ import auth from "./modules/auth";
 import comment from "./modules/comment";
 import chat from "./modules/chat";
 import admin from "./modules/admin";
+import user from "./modules/user";
 const store = createStore({
-    modules: { toast, profile, auth, comment, chat, admin },
+    modules: { toast, profile, auth, comment, chat, admin, user },
 });
 export default store;

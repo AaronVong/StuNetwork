@@ -106,6 +106,7 @@ export default {
                 ".xls",
                 ".xlsx",
                 ".txt",
+                ".pdf",
             ],
         };
     },

@@ -252,10 +252,10 @@ export default {
         return {
             form: {
                 fullname: "",
-                address: "",
-                phone: "",
+                address: null,
+                phone: null,
                 gender: true,
-                birthday: "",
+                birthday: null,
                 avatarUrl: "",
                 backgroundUrl: "",
             },
@@ -326,6 +326,12 @@ export default {
                 this.toggleEditProfile();
                 this.$message.success({
                     message: this.profileInfoMessage,
+                });
+            } else {
+                this.$msgbox({
+                    type: "error",
+                    title: "Lỗi",
+                    message: this.profileValidates,
                 });
             }
             loading.close();

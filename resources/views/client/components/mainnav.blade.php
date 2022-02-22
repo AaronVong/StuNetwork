@@ -12,6 +12,12 @@
             </a>
         </li>
         <li class="pill relative mb-3 w-full h-12">
+            <a href="{{ route('home-other') }}" class="{{Route::current()->getName() == 'home-other' ? 'text-blue-400' : ''}} flex justify-evenly items-center w-full h-full pill-hover font-medium text-2xl text-gray-700">
+                <i class="fas fa-star-of-david"></i>
+                <span class="hidden lg:inline-block lg:text-base xl:text-xl lg:w-4/6">Bài viết khác</span>
+            </a>
+        </li>
+        <li class="pill relative mb-3 w-full h-12">
             <a href="{{ route('chat') }}" class="{{Route::current()->getName() == 'chat' ? 'text-blue-400' : ''}} flex justify-evenly items-center w-full h-full pill-hover font-medium text-2xl text-gray-700">
                 <i class="far fa-envelope"></i>
                 <span class="hidden lg:inline-block lg:text-base xl:text-xl lg:w-4/6">Tin nhắn</span>

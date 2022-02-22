@@ -10,9 +10,12 @@ use App\Http\Controllers\Client\ToastCommentController;
 use App\Http\Controllers\Client\ToastController;
 use App\Http\Controllers\Client\UserController;
 use App\Http\Controllers\Client\MessageController;
+use App\Http\Controllers\Client\SettingUserController;
 use App\Models\User;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Route;
+use Spatie\Permission\Models\Role;
 
 /*
 |--------------------------------------------------------------------------
@@ -55,6 +58,7 @@ Route::middleware(["verified", "auth", "role:super-admin"])->group(function(){
     Route::post("/list-users/{user:username}/loginpermission", [AdminController::class, "loginPermission"]);
     Route::post("/list-users/{user:username}/edit",[AdminController::class, "editUserAccount"]);
     Route::get("/list-toasts", [AdminController::class, "getListToasts"]);
+    Route::get("/dashboard/toast/{user:username}", [AdminController::class, "toastDetail"]);
 });
 /*
 |--------------------------------------------------------------------------
@@ -67,9 +71,11 @@ Route::get('/reset-password/{token}',[UserController::class, "resetPasswordForm"
 Route::post("/reset-password",[UserController::class, "resetPassword"])->name("password.update");
 
 Route::middleware(["verified", "auth", "permission:login"])->group(function(){
+    Route::put("/user/change-password", [UserController::class, "changePassword"]);
     Route::get("/search/{user:username}",[UserController::class, "searchUserbyUsername"]);
     Route::get("/get-user", [UserController::class, "getUser"]);
     Route::get("/", [HomeController::class, "index"])->name("home");
+    Route::get("/home-other", [HomeController::class, "homeOther"])->name("home-other");
     Route::get("/profile/{user:username}", [ProfileController::class, "index"])->name("profile");
     Route::get("/profile/get/{user:username}", [ProfileController::class, "getProfile"])->name("profile.get");
     Route::put("/profile/{username}", [ProfileController::class, "updateProfile"])->name("profile.update");
@@ -78,6 +84,8 @@ Route::middleware(["verified", "auth", "permission:login"])->group(function(){
     Route::post("/proifle/followings", [UserController::class, "profilesFollowedById"]);
 
     Route::get("/toast", [ToastController::class, "paginate"])->name("toast.paginate");
+    
+
     Route::get("/toast/{id}", [ToastController::class, "index"])->name("toast");
     Route::get("/toast/get/{id}", [ToastController::class, "getToast"])->name("toast.get");
     Route::post("/toast", [ToastController::class, "store"])->name("toast.store");
@@ -97,9 +105,14 @@ Route::middleware(["verified", "auth", "permission:login"])->group(function(){
     Route::get("/messages/{receiver_id}", [MessageController::class, "fetchMessages"])->name("chat.fetch");
     Route::post("/messages/{receiver_id}", [MessageController::class, "sendMessage"])->name("chat.send");
     Route::delete("/messages/{receiver_id}/{message_id}", [MessageController::class, "deleteMessage"])->name("chat.delette");
+    Route::get("/chat/{user:id}", [MessageController::class, "findStranger"]);
     # Route::get("/messages", [MessageController::class, "fetchMessages"])->name("chat.fetch");
     # Route::post("/messages", [MessageController::class, "sendMessage"])->name("chat.send");
-   
+
+    route::get("/settings", [SettingUserController::class, "settings"])->name("settings");
+    route::get("/{user:username}/settings", [SettingUserController::class, "userSettings"])->name("settings.user");
+    route::post("/settings", [SettingUserController::class, "changeSettings"])->name("settings.change");
 });
+
 
 

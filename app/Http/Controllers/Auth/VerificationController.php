@@ -3,9 +3,10 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\Setting;
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
-
+use Spatie\Permission\Models\Role;
 
 class VerificationController extends Controller
 {
@@ -24,11 +25,14 @@ class VerificationController extends Controller
     # Xử lý yêu cầu xác minh email
     function emailVerification(EmailVerificationRequest $request) {
         if($request->user()->email_verified_at == null){
-            if($request->user()->isStudent() !== false){
-                $request->user()->roles()->attach(1);
-            }else{
-                $request->user()->roles()->attach(2);
-            }
+            $userRole = Role::findByName("user");
+            $userPermissions = $userRole->permissions()->get();
+            $request->user()->givePermissionTo($userPermissions);
+            
+            $settings = Setting::all();
+            foreach($settings as $setting){
+                $request->user()->settings()->attach($setting->id, ["value"=> true]);
+            };
             $request->fulfill();
         }
         return redirect()->route("home");

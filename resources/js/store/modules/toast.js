@@ -13,7 +13,14 @@ export default {
         // Lấy toast list đã phân trang
         async toastListPaginateAction({ commit, state }) {
             try {
-                const response = await axios.get(`/toast?page=${state.page}`);
+                let path = `/toast?page=${state.page}`;
+                const regex = new RegExp("^(/home-other)$", "i");
+                const result = regex.test(window.location.pathname);
+                if (result) {
+                    // nếu đang trang chi tiết toast không chạy infinite scroll
+                    path = `home-other?page=${state.page}`;
+                }
+                const response = await axios.get(path);
                 if (response.status == 200) {
                     commit("toastListPaginateSuccess", response.data);
                     return false;
@@ -219,15 +226,7 @@ export default {
         likeToastSuccess(state, payload) {
             state.toastList = state.toastList.map((item) => {
                 if (item.id == payload.toastID) {
-                    if (payload.liked === true) {
-                        // like thành công
-                        item.likesCount += 1;
-                    } else if (payload.liked === false) {
-                        // dislike thành công
-                        item.likesCount -= 1;
-                    } else {
-                        // khác
-                    }
+                    item.likesCount = payload.likes.length;
                 }
                 return item;
             });

@@ -55,4 +55,7 @@ class UserPolicy
         return $user->hasPermissionTo('delete message') ? Response::allow('',200) : Response::deny("Tài khoản đã bị khóa chức năng xóa tin nhắn",403);
     }
 
+    public function changePassword(User $user){
+        return $user->id == auth()->user()->id ? Response::allow('',200) : Response::deny("Xác minh thất bại",403);
+    }
 }

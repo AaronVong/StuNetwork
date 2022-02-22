@@ -87,13 +87,31 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
             'role_id'
         )->with("permissions");
     }
+
+    public function settings(){
+        return $this->belongsToMany(Setting::class, "setting_user")->using(SettingUser::class)->withPivot("value");
+    }
     /**
      * 
      * Helper
      * 
      */
-    function isStudent(){
+    public function isStudent(){
 	    $domain = substr($this->email, strpos($this->email,"@")+1);
-        return $domain !== false ? strpos($domain,"student"): false;
+        return $domain !== false ? strpos($domain,"student") : false;
+    }
+    # return Setting Model = accept, null = denied
+    public function acceptMessageFromStudent(){
+        return $this->belongsToMany(Setting::class, "setting_user")->where("name", "student message")->using(SettingUser::class)->withPivot("value")->wherePivot("value", true)->first();
+    }
+
+    # return Setting Model = accept, null = denied
+    public function acceptMessageFromTeacher(){
+        return $this->belongsToMany(Setting::class, "setting_user")->where("name", "teacher message")->using(SettingUser::class)->withPivot("value")->wherePivot("value", true)->first();
+    }
+
+    # return Setting Model = accept, null = denied
+    public function acceptMessageFromStranger(){
+        return $this->belongsToMany(Setting::class, "setting_user")->where("name", "stranger message")->using(SettingUser::class)->withPivot("value")->wherePivot("value", true)->first();
     }
 }

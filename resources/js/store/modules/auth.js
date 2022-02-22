@@ -16,10 +16,10 @@ export default {
                     },
                 });
                 if (response.status == 200) {
+                    commit("authActionSuccess", response.data);
                     if (response.data.next) {
                         window.location.replace(response.data.next);
                     }
-                    commit("authActionSuccess", response.data);
                 }
             } catch (error) {
                 commit("authActionFail", error.response);

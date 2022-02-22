@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Setting;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Seeder;
@@ -18,6 +19,7 @@ class UserSeeder extends Seeder
      */
     public function run()
     {
+        # Tạo user
         $user1 = [
             "username" => "minhvong",
             "email"=>"minh.vongquyen@student.stu.edu.vn",
@@ -36,14 +38,18 @@ class UserSeeder extends Seeder
             "password" => Hash::make("vongquyenminh"),
             "email_verified_at" => Carbon::now()->toDateTimeString(),
         ];
+        DB::table("users")->insert([$user1, $user2, $user3]);
+
+        # Cấp quyền cho từng user
         $userRole = Role::findByName("user");
         $userPermissions = $userRole->permissions()->get();
-        DB::table("users")->insert([$user1, $user2, $user3]);
         $admin = User::find(1);
         $admin->assignRole(["super-admin"]);
         $admin->givePermissionTo($userPermissions);
         User::find(2)->givePermissionTo($userPermissions);
         User::find(3)->givePermissionTo($userPermissions);
+
+        # Tạo profile cho từng user
         $user1Profile = [
             "user_id" => 1,
             "fullname" => "Vòng Quyền Minh"
@@ -57,5 +63,14 @@ class UserSeeder extends Seeder
             "user_id" => 3,
         ];
         DB::table("profiles")->insert([$user1Profile, $user2Profile, $user3Profile]);
+
+        # Gán setting cho từng user
+        $settings = Setting::all();
+        $users = User::all();
+        foreach($users as $user){
+            foreach($settings as $setting){
+                $user->settings()->attach($setting->id, ["value"=> true]);
+            }
+        }
     }
 }

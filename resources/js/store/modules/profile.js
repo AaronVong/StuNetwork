@@ -39,6 +39,12 @@ const toast = {
                     profile_id,
                 });
                 commit("toggleFollowSucces", response.data);
+                if (response.data.followed) {
+                    // Xóa 1 stranger bằng profile id
+                    commit("removeStranger", response.data.profile.id, {
+                        root: true,
+                    });
+                }
             } catch (error) {
                 commit("profileActionFail", error.response);
             }

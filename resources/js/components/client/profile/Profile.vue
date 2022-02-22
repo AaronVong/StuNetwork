@@ -59,11 +59,17 @@
                     :followedcount="this.followedcount"
                     :toastcount="this.toastcount"
                 />
-                <ProfileFollow
-                    v-if="!this.owned"
-                    :followable="this.followable"
-                    :profile_id="this.profile.id"
-                />
+                <div class="w-full flex flex-col gap-3 justify-start items-end">
+                    <ProfileFollow
+                        v-if="!this.owned"
+                        :followable="this.followable"
+                        :profile_id="this.profile.id"
+                    />
+                    <UserSettings
+                        v-if="this.owned"
+                        :username="this.user_profile.user.username"
+                    />
+                </div>
             </div>
         </div>
     </div>
@@ -80,6 +86,8 @@ import ProfileBackground from "./ProfileBackground.vue";
 import ProfileInfo from "./ProfileInfo.vue";
 import ProfileFollow from "./ProfileFollow.vue";
 import ProfileNav from "./ProfileNav.vue";
+import ChangePassword from "./ChangePassword.vue";
+import UserSettings from "../user/Settings";
 import { mapGetters, mapActions, mapMutations } from "vuex";
 export default {
     name: "Profile",
@@ -114,6 +122,8 @@ export default {
         ProfileInfo,
         ProfileFollow,
         ProfileNav,
+        ChangePassword,
+        UserSettings,
     },
     methods: {
         ...mapActions(["getProfileAction", "isFollowed"]),

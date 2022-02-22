@@ -24,7 +24,15 @@
             v-else
             v-for="(user, index) in this.foundList"
             :key="index"
-            class="w-full flex items-center mb-3"
+            @click="this.handleClick($event, index)"
+            class="
+                w-full
+                flex
+                items-center
+                mb-3
+                hover:bg-gray-100
+                cursor-pointer
+            "
         >
             <div class="flex-grow-0 flex-shrink-0 max-w-xs mr-2">
                 <img
@@ -136,6 +144,7 @@ export default {
     },
     methods: {
         ...mapActions(["toggleFollow"]),
+        ...mapMutations(["changeChatWith"]),
         async handleSubmit(e) {
             e.preventDefault();
             try {
@@ -150,7 +159,25 @@ export default {
             await this.toggleFollow(profileID);
             this.foundList[index]["followed"] = this.followed;
         },
+        handleClick(e, index) {
+            if (!$(e.target).is("button") || !$(e.target).is("a")) {
+                const regex = new RegExp("^(/chat)(/*)?$", "i");
+                const result = regex.test(window.location.pathname);
+                if (result) {
+                    const profile = {
+                        ...this.foundList[index].profile,
+                        user: {
+                            id: this.foundList[index].id,
+                            username: this.foundList[index].username,
+                        },
+                    };
+                    this.changeChatWith(profile);
+                    this.$emit("close", e);
+                }
+            }
+        },
     },
     mounted() {},
+    emits: ["close"],
 };
 </script>

@@ -15,11 +15,11 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 class ToastController extends Controller
 {
 
-    private $textExtension= ["txt", "doc", "docx", "ppt", "pptx", "xls", "xlsx"];
+    private $textExtension= ["txt", "doc", "docx", "ppt", "pptx", "xls", "xlsx", "pdf"];
     private $rules=[
         "content" => ["required"],
         "files_upload" =>["array", "max:4"],
-        "files_upload.*"=> ["mimes:jpg,jpeg,png,txt,docx,doc,ppt,pptx,xls,xlsx", "max:3192", "mimetypes:image/jpg,image/jpeg,image/png,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/plain"],
+        "files_upload.*"=> ["mimes:jpg,jpeg,png,txt,docx,doc,ppt,pptx,xls,xlsx,pdf", "max:3192", "mimetypes:image/jpg,image/jpeg,image/png,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/plain,application/pdf"],
     ];
     private $messages =[
         "content.required" => "Nội dung không thể để trống",
@@ -91,13 +91,16 @@ class ToastController extends Controller
         if(!$request->ajax()){
             throw new HttpException(404);
         }
+        # Lấy danh sách toast của các user đã theo dõi và của chính mình
+        $followingList = auth()->user()->followings()->pluck("following_id");
+        $followingList[] = auth()->user()->id;
         $toasts = Toast::with(["user:id,username","ownerProfile:user_id,id,fullname,avatarUrl", "files"])->withCount(["likes as liked" => function (Builder $query){
             $query->where("user_id", auth()->user()->id);
         }, "toastComments as commentsCount", "ownerProfile as followed" => function(Builder $query){
             $query->whereHas("followers", function($follower){
                 $follower->where("follower_id", auth()->user()->id);
             });
-        },"likes as likesCount"])->orderBy("created_at", "desc")->paginate(5)->items();
+        },"likes as likesCount"])->whereIn("user_id", $followingList)->orderBy("created_at", "desc")->paginate(5)->items();
         return count($toasts) > 0 ? response(["toasts" => $toasts], 200) : response(["message" => "Không còn toast"], 204);
     }
 

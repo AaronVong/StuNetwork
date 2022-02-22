@@ -1,14 +1,8 @@
 <template>
     <div v-if="!this.userChatWith">
         <h3 v-if="!this.userChatWith" class="text-2xl text-center p-6">
-            Hãy chọn cuộc trò chuyện
+            Chọn cuộc trò chuyện hoặc tìm kiếm...
         </h3>
-        <!-- <h3
-            v-else-if="this.chatErrorMessage"
-            class="text-2xl text-center p-6 text-red-500"
-        >
-            {{ this.chatErrorMessage }}
-        </h3> -->
     </div>
     <div v-else class="w-full h-full flex flex-col" v-loading="this.loading">
         <div class="w-full flex flex-col flex-grow h-80 border">
@@ -48,7 +42,10 @@
                 </div>
             </div>
             <!-- Messages Display-->
-            <div id="messages-monitor" class="overflow-y-auto flex-grow h-80">
+            <div
+                id="messages-monitor"
+                class="overflow-y-auto flex-grow h-80 py-6"
+            >
                 <div v-if="this.loadMore" class="flex items-center px-3">
                     <img
                         src="/images/Pulse-1s-200px.svg"
@@ -62,7 +59,7 @@
                     :isSender="message.sender_id == this.user.id"
                     v-on:toBottom="this.scrollToBottom"
                 />
-                <div v-show="this.typings" class="flex items-center px-3">
+                <div v-show="this.typing" class="flex items-center px-3">
                     <img
                         src="/images/Pulse-1s-197px.svg"
                         class="h-16 bg-transparent"
@@ -81,6 +78,7 @@
 import Message from "./Message.vue";
 import ChatForm from "./ChatForm.vue";
 import { mapActions, mapGetters, mapMutations } from "vuex";
+import axios from "axios";
 export default {
     name: "Chat",
     data() {
@@ -103,6 +101,8 @@ export default {
             "chatMessages",
             "chatErrorMessage",
             "chatUser",
+            "followings",
+            "chatStrangers",
         ]),
     },
     watch: {
@@ -132,6 +132,7 @@ export default {
             "setMessagePage",
             "resetMessages",
             "deleteMessagesSuccess",
+            "pushStranger",
         ]),
         ...mapActions(["fetchMessagesAction"]),
         scrollToBottom() {
@@ -152,7 +153,7 @@ export default {
                     this.typingUser = e.user;
                 }
             })
-            .listenForWhisper("sent", (e) => {
+            .listenForWhisper("sent", async (e) => {
                 if (this.userChatWith) {
                     if (this.userChatWith.user_id == e.user.id) return;
                 }
@@ -161,6 +162,23 @@ export default {
                     message: e.message,
                     title: `${e.user.username} nhắn cho bạn`,
                 });
+
+                // Tìm người gửi và xem người này có nằm trong danh sách following hay không nếu không hiện thị trong danh sách người lạ.
+                const isNotStranger = this.followings.some(
+                    (user) => user.user_id == e.user.id
+                );
+                const strangerExist = this.chatStrangers.some(
+                    (user) => user.id == e.user.id
+                );
+                console.log(strangerExist);
+                if (isNotStranger == false && strangerExist == false) {
+                    const response = await axios
+                        .get(`/chat/${e.user.id}`)
+                        .catch((error) => console.log(error));
+                    if (response) {
+                        this.pushStranger(response.data.stranger);
+                    }
+                }
             })
             .listenForWhisper("delete-message", (e) => {
                 if (this.userChatWith.user_id == e.sender.id) {

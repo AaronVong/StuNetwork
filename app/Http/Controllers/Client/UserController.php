@@ -4,13 +4,16 @@ namespace App\Http\Controllers\Client;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Rules\CurrentPassword;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Validator;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
@@ -30,7 +33,7 @@ class UserController extends Controller
 
     public function __construct()
     {
-        $this->middleware(["guest"])->only(["resetPasswordForm", "resetPassword"]);
+        $this->middleware(["guest"])->only(["resetPasswordForm", "resetPassword", "forgotPassword", "forgotPasswordForm"]);
     }
 
     # View quên mật khẩu
@@ -117,5 +120,32 @@ class UserController extends Controller
             });
         }])->where([["username",'like' ,'%'.$username.'%']])->get();
         return response(["users" => $users],200);
+    }
+
+    public function changePassword(Request $request){
+        $response = Gate::inspect("changePassword",$request->user());
+        if($response->denied()){
+            return response(["message" => $response->message()], $response->code());
+        }
+        
+        $validator = Validator::make($request->all(),[
+            "old_password" => ["required", "max:255", new CurrentPassword],
+            "password" => ["required", "max:255","min:8", "confirmed"],
+        ],[
+            "old_password.required" => "Hãy nhập mật khẩu cũ vào",                             
+            "old_password.max" => "Mật khẩu cũ không hợp lệ",
+            "password.required" => "Mật khẩu không thể bỏ trống",                       
+            "password.min" => "Mật khẩu cần ít nhất :min ký tự",            
+            "password.max" => "Mật khẩu quá dài",
+            "password.confirmed" => "Mật khẩu không trùng khợp",   
+        ]);
+        if($validator->fails()){
+            return response(["validates" => $validator->errors()], 422);
+        }
+
+        $user = Auth::user();
+        $user->password = Hash::make($request->password);
+        $user->save();
+        return response(["message" => "Cập nhật mật khẩu thành cồng"], 200);
     }
 }

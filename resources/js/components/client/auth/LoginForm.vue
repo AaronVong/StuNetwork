@@ -37,7 +37,9 @@
                     mb-3
                     text-md
                     focus:outline-none
-                    focus:ring focus:ring-1 focus:ring-blue-400
+                    focus:ring
+                    focus:ring-1
+                    focus:ring-blue-400
                 "
                 type="text"
                 id="email"
@@ -65,7 +67,9 @@
                     mb-3
                     text-md
                     focus:outline-none
-                    focus:ring focus:ring-1 focus:ring-blue-400
+                    focus:ring
+                    focus:ring-1
+                    focus:ring-blue-400
                 "
                 type="password"
                 id="password"
@@ -101,7 +105,9 @@
                     bg-blue-500
                     hover:bg-blue-600
                     focus:outline-none
-                    focus:ring focus:ring-1 focus:ring-blue-400
+                    focus:ring
+                    focus:ring-1
+                    focus:ring-blue-400
                     text-gray-200
                 "
             >

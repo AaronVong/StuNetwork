@@ -77,8 +77,13 @@ export default {
                     message: this.form.message,
                 });
             } else {
-                this.$message({
+                // this.$message({
+                //     type: "error",
+                //     message: this.chatErrorMessage,
+                // });
+                this.$msgbox({
                     type: "error",
+                    title: "Lỗi",
                     message: this.chatErrorMessage,
                 });
             }

@@ -42,9 +42,7 @@
             xl:bg-white
             ${this.visible ? 'w-2/5' : ''}
             flex flex-col
-            border-r
-            border-l
-            lg:border-l-0
+            border
             xl:relative xl:w-full xl:h-full
             `"
     >
@@ -52,6 +50,9 @@
             v-if="this.followings.length > 0"
             class="w-full h-full flex flex-col"
         >
+            <h4 class="w-full py-3 text-center text-lg border-b border-t">
+                Đang theo dõi
+            </h4>
             <ChatListItem
                 v-for="(item, index) in this.followings"
                 :key="index"
@@ -70,7 +71,21 @@
                 text-wrap text-lg
             "
         >
-            <h4 class="text-lg font-md p-4">Theo dõi để có thể nhắn tin...</h4>
+            <h4 class="text-lg font-md p-4">Chưa theo dõi bất kỳ ai..</h4>
+        </div>
+        <div
+            v-if="this.chatStrangers.length > 0"
+            class="w-full h-full flex flex-col"
+        >
+            <h4 class="w-full py-3 text-center text-lg border-b border-t">
+                Người lạ
+            </h4>
+            <Stranger
+                v-for="(user, index) in this.chatStrangers"
+                :key="index"
+                :user="user"
+                v-on:itemClicked="this.toggleChatList"
+            />
         </div>
         <button
             type="button"
@@ -95,6 +110,7 @@
 
 <script>
 import ChatListItem from "./ChatListItem.vue";
+import Stranger from "./Stranger.vue";
 import { mapMutations, mapGetters } from "vuex";
 export default {
     name: "ChatList",
@@ -108,19 +124,21 @@ export default {
             type: Array,
             default: [],
         },
+        strangers: Array,
     },
     computed: {
-        ...mapGetters(["followings"]),
+        ...mapGetters(["followings", "chatStrangers"]),
     },
-    components: { ChatListItem },
+    components: { ChatListItem, Stranger },
     methods: {
-        ...mapMutations(["setFollowingsList"]),
+        ...mapMutations(["setFollowingsList", "setStrangers"]),
         toggleChatList() {
             this.visible = !this.visible;
         },
     },
     mounted() {
         this.setFollowingsList(this.chat_list);
+        this.setStrangers(this.strangers);
     },
 };
 </script>

@@ -52,7 +52,13 @@
                         {{ user.email }}
                     </td>
                     <td class="border-2 border-gray-300 border-collapse p-3">
-                        {{ user.profile.gender }}
+                        {{
+                            user.profile.gender == 1
+                                ? "Nam"
+                                : user.profile.gender == 0
+                                ? "Nữ"
+                                : "Chưa cập nhật"
+                        }}
                     </td>
                     <td class="border-2 border-gray-300 border-collapse p-3">
                         <div

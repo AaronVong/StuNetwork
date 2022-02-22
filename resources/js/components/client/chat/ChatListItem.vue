@@ -109,6 +109,7 @@ export default {
         },
         handleChatWith(e) {
             e.preventDefault();
+            if ($(e.target).is("button[type='button']")) return;
             this.changeChatWith(this.profile);
             this.$emit("itemClicked");
         },

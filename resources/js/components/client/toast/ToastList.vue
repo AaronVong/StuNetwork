@@ -12,7 +12,10 @@
                 :key="index"
                 :toast="toast"
                 :owned="
-                    this.owner === toast.user.id && this.owner === this.guest
+                    this.guest
+                        ? this.owner == toast.user.id &&
+                          this.owner == this.guest
+                        : this.owner == toast.user.id
                 "
                 :liked="toast.liked == 1"
                 :followed="toast.followed == 1"
@@ -47,7 +50,7 @@ export default {
         // user hiện hành (user đang đăng nhập)
         owner: Number,
         // user xem danh sách
-        guest: Number,
+        guest: { type: Number, default: null },
         toast_list: { type: Array, default: null },
         // Loại list sẽ được sử dụng
         // list : mặc định,

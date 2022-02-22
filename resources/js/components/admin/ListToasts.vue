@@ -73,7 +73,9 @@
                         {{ toast.id }}
                     </td>
                     <td class="border-2 border-gray-300 border-collapse p-3">
-                        {{ toast.user.username }}
+                        <a :href="`/dashboard/toast/${toast.user.username}`">
+                            {{ toast.user.username }}
+                        </a>
                     </td>
                     <td class="border-2 border-gray-300 border-collapse p-3">
                         <p class="w-36 truncate">
@@ -174,9 +176,7 @@ export default {
         };
     },
     components: { ToastFile },
-    props: {
-        toasts: Object,
-    },
+    props: { toasts: Object },
     computed: {
         ...mapGetters(["adminErrorMessage"]),
         disabledInfiniteScroll() {
@@ -234,6 +234,14 @@ export default {
     beforeMount() {
         this.localToasts = [...this.toasts.data];
         this.page++;
+    },
+    mounted() {
+        const regex = new RegExp("^(/dashboard/toast)/[a-zA-Z]+$", "i");
+        const result = regex.test(window.location.pathname);
+        if (result) {
+            this.noMore = true;
+            this.loading = false;
+        }
     },
 };
 </script>

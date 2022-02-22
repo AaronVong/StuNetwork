@@ -9,6 +9,7 @@ export default {
             user: null,
             messages: [],
             page: 1,
+            strangers: [],
         };
     },
     actions: {
@@ -111,6 +112,17 @@ export default {
         resetMessages(state, payload) {
             state.messages = [];
         },
+        setStrangers(state, payload) {
+            state.strangers = [...payload];
+        },
+        removeStranger(state, payload) {
+            state.strangers = state.strangers.filter(
+                (stranger) => stranger.profile.id != payload
+            );
+        },
+        pushStranger(state, payload) {
+            state.strangers.unshift({ ...payload });
+        },
     },
     getters: {
         chatValidates(state) {
@@ -133,6 +145,9 @@ export default {
         },
         chatPage(state) {
             return state.page;
+        },
+        chatStrangers(state) {
+            return state.strangers;
         },
     },
 };

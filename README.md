@@ -14,7 +14,7 @@ Login:
 email: dh51703728@student.stu.edu.vn
 password: vongquyenminh
 
-## Functions That Not Works Online
+## Features That Not Works
 1. Mailing
 2. Chat
 3. Upload file

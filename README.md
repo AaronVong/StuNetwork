@@ -10,6 +10,10 @@
 ## Preview
 http://toastnow.tk/
 
+Login:
+email: dh51703728@student.stu.edu.vn
+password: vongquyenminh
+
 ## Functions That Not Works Online
 1. Mailing
 2. Chat
